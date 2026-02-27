@@ -1,0 +1,10 @@
+# HVE Core ephemeral workflow artifacts
+.copilot-tracking/
+
+# Python virtual environments
+.venv/
+__pycache__/
+*.pyc
+
+# OS files
+.DS_Store
