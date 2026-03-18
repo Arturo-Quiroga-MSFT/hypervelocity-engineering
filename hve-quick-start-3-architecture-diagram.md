@@ -59,6 +59,42 @@ VS Code renders this as a visual diagram in the Markdown preview. You can:
 * Export it as an image (PNG/SVG) using a Mermaid CLI tool or VS Code extension
 * Paste it into a partner-facing design document
 
+## Example: RAG Customer Support App on Azure
+
+Here is a full example of what the agent produces for a partner building a RAG-based customer support application. This started as a plain English description and was iteratively refined with follow-up requests ("add Azure Monitor for observability"):
+
+```mermaid
+graph LR
+    User["End User\n(Browser)"] --> APIM["Azure API Management"]
+    APIM --> AppService["Azure App Service\n(Web Frontend)"]
+    AppService --> MAF["Microsoft Agent Framework\n(Orchestrator Agent)"]
+    MAF --> OpenAI["Azure OpenAI\n(GPT-4o)"]
+    MAF --> AISearch["Azure AI Search\n(Knowledge Base Index)"]
+    AISearch --> Blob["Azure Blob Storage\n(Documents & PDFs)"]
+    MAF --> CosmosDB["Azure Cosmos DB\n(Chat History)"]
+    AppService --> KeyVault["Azure Key Vault\n(Secrets)"]
+    OpenAI --> KeyVault
+
+    APIM -.-> Monitor["Azure Monitor\n(App Insights)"]
+    AppService -.-> Monitor
+    MAF -.-> Monitor
+    OpenAI -.-> Monitor
+    AISearch -.-> Monitor
+
+    style User fill:#4FC3F7,stroke:#0288D1,color:#000
+    style APIM fill:#7E57C2,stroke:#512DA8,color:#fff
+    style AppService fill:#66BB6A,stroke:#388E3C,color:#000
+    style MAF fill:#FF7043,stroke:#E64A19,color:#fff
+    style OpenAI fill:#42A5F5,stroke:#1E88E5,color:#000
+    style AISearch fill:#AB47BC,stroke:#8E24AA,color:#fff
+    style Blob fill:#FFCA28,stroke:#F9A825,color:#000
+    style CosmosDB fill:#26A69A,stroke:#00897B,color:#fff
+    style KeyVault fill:#EF5350,stroke:#E53935,color:#fff
+    style Monitor fill:#FFB74D,stroke:#FB8C00,color:#000
+```
+
+Solid lines represent the primary data flow. Dashed lines represent telemetry and observability connections to Azure Monitor.
+
 ## More Examples for Common PSA Scenarios
 
 Describe whatever architecture your partner is building:
