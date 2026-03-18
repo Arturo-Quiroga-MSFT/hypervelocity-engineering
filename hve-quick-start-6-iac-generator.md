@@ -79,7 +79,7 @@ Adapt the prompt to whatever Azure environment your partner needs:
 
 ```text
 Generate Bicep for a RAG-based application environment: Azure OpenAI
-with GPT-4o and text-embedding-ada-002 deployments, Azure AI Search
+with GPT--5.4 and text-embedding-3-small deployments, Azure AI Search
 (Standard tier) with a semantic ranker enabled, Azure Cosmos DB for
 chat history, and Azure Key Vault for secrets. Connect Key Vault to
 all services using managed identities.
