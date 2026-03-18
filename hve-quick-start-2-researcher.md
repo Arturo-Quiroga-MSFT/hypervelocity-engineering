@@ -66,6 +66,44 @@ Foundry Agent Services. Include prerequisites, deployment steps,
 and common configuration issues.
 ```
 
+## How the Researcher Works
+
+```mermaid
+graph LR
+    You["You\n(One prompt)"] --> Researcher["Researcher\nSubagent"]
+
+    Researcher --> Docs["Microsoft Learn\nDocumentation"]
+    Researcher --> SDK["SDK References\n& API Specs"]
+    Researcher --> Samples["Code Samples\n& Tutorials"]
+    Researcher --> Web["Web Content\n& Release Notes"]
+
+    Docs --> Output["Structured Briefing"]
+    SDK --> Output
+    Samples --> Output
+    Web --> Output
+
+    Output --> Summary["Architecture overview"]
+    Output --> Versions["SDK versions & packages"]
+    Output --> Patterns["Integration patterns"]
+    Output --> Limits["Limitations & workarounds"]
+    Output --> Links["Source links"]
+
+    style You fill:#4FC3F7,stroke:#0288D1,color:#000
+    style Researcher fill:#FF7043,stroke:#E64A19,color:#fff
+    style Docs fill:#7E57C2,stroke:#512DA8,color:#fff
+    style SDK fill:#7E57C2,stroke:#512DA8,color:#fff
+    style Samples fill:#7E57C2,stroke:#512DA8,color:#fff
+    style Web fill:#7E57C2,stroke:#512DA8,color:#fff
+    style Output fill:#FFB74D,stroke:#FB8C00,color:#000
+    style Summary fill:#66BB6A,stroke:#388E3C,color:#000
+    style Versions fill:#66BB6A,stroke:#388E3C,color:#000
+    style Patterns fill:#66BB6A,stroke:#388E3C,color:#000
+    style Limits fill:#66BB6A,stroke:#388E3C,color:#000
+    style Links fill:#66BB6A,stroke:#388E3C,color:#000
+```
+
+One prompt in, structured briefing out. The researcher handles the tab-hopping so you can focus on preparing your talking points.
+
 ## Why This Matters
 
 | Manual Prep | Researcher Subagent |

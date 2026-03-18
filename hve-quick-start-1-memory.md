@@ -49,6 +49,32 @@ document processing solution using Azure Document Intelligence
 and Azure OpenAI.
 ```
 
+## Before and After
+
+```mermaid
+graph TD
+    subgraph before ["Without Memory"]
+        direction TB
+        Q1["You: How do I build\na RAG agent?"] --> A1["Copilot: Generic answer\n(React? LangChain? Flask?)"]
+        Q2["You: Use Azure OpenAI\nand MAF, I'm a PSA..."] --> A2["Copilot: Better answer\n(but you re-explained everything)"]
+        Q3["Next session:\nstarts from zero again"] --> A3["Copilot: Who are you?"]
+    end
+
+    subgraph after ["With Memory"]
+        direction TB
+        M["One-time setup:\nMemory agent stores your role,\nstack, and partner context"] --> Q4["You: How do I build\na RAG agent?"]
+        Q4 --> A4["Copilot: Here's a MAF-based\nagent on Foundry with\nAzure AI Search + OpenAI"]
+    end
+
+    style before fill:#FFEBEE,stroke:#E53935,color:#000
+    style after fill:#E8F5E9,stroke:#388E3C,color:#000
+    style M fill:#FFF9C4,stroke:#F9A825,color:#000
+    style A1 fill:#FFCDD2,stroke:#E53935,color:#000
+    style A2 fill:#FFE0B2,stroke:#FB8C00,color:#000
+    style A3 fill:#FFCDD2,stroke:#E53935,color:#000
+    style A4 fill:#C8E6C9,stroke:#388E3C,color:#000
+```
+
 ## Why This Matters
 
 | Without Memory | With Memory |
