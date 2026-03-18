@@ -86,8 +86,9 @@ graph TD
 ## Next Steps
 
 * Try [Quick Start 2: Prep for a Partner Call in 5 Minutes](hve-quick-start-2-researcher.md) to see how your memory context improves research results.
+* Return to the [Quick Start Series README](README.md) for the full learning path.
 * Explore the full [HVE Core Use Cases for PSAs](hve-core-use-cases-for-psa.md) when you are ready to go deeper.
 
 ---
 
-*Part 1 of 3 in the HVE Quick Start series for Partner Solutions Architects*
+*Part 1 of 6 in the HVE Quick Start series for Partner Solutions Architects*

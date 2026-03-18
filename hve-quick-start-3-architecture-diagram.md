@@ -141,9 +141,10 @@ The agent updates the diagram while preserving the existing structure.
 
 ## Next Steps
 
-* You have completed the HVE Quick Start series. You can now configure your context, research any topic, and produce visual deliverables, all in under 10 minutes.
-* Explore the full [HVE Core Use Cases for PSAs](hve-core-use-cases-for-psa.md) for advanced workflows including RPI (Research, Plan, Implement), custom agent creation, and IaC generation.
+* Try [Quick Start 4: Document Your Architecture Decisions in 2 Minutes](hve-quick-start-4-adr.md) to capture the decisions behind your designs.
+* Return to the [Quick Start Series README](README.md) for the full learning path.
+* Explore the full [HVE Core Use Cases for PSAs](hve-core-use-cases-for-psa.md) for advanced workflows including RPI (Research, Plan, Implement), custom agent creation, and more.
 
 ---
 
-*Part 3 of 3 in the HVE Quick Start series for Partner Solutions Architects*
+*Part 3 of 6 in the HVE Quick Start series for Partner Solutions Architects*

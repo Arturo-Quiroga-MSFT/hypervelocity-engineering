@@ -119,8 +119,9 @@ One prompt in, structured briefing out. The researcher handles the tab-hopping s
 ## Next Steps
 
 * Try [Quick Start 3: Turn Your Whiteboard into a Real Diagram](hve-quick-start-3-architecture-diagram.md) to produce a visual deliverable from your research.
+* Return to the [Quick Start Series README](README.md) for the full learning path.
 * Explore the full [HVE Core Use Cases for PSAs](hve-core-use-cases-for-psa.md) when you are ready to go deeper.
 
 ---
 
-*Part 2 of 3 in the HVE Quick Start series for Partner Solutions Architects*
+*Part 2 of 6 in the HVE Quick Start series for Partner Solutions Architects*
