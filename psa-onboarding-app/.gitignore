@@ -1,0 +1,10 @@
+# Progress tracking (local only)
+.psa_progress.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Streamlit
+.streamlit/secrets.toml
