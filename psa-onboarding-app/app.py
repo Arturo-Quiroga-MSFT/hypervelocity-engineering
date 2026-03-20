@@ -21,12 +21,28 @@ OUTPUTS_DIR = Path(__file__).parent / "outputs"
 
 MODEL_OPTIONS = [
     "(default)",
+    # --- Premium (3x) ---
+    "claude-opus-4.6",
+    "claude-opus-4.5",
+    # --- Standard (1x) ---
+    "gpt-5.4",
+    "gpt-5.3-codex",
+    "gpt-5.2-codex",
+    "gpt-5.2",
+    "gpt-5.1-codex-max",
+    "gpt-5.1-codex",
+    "gpt-5.1",
+    "claude-sonnet-4.6",
     "claude-sonnet-4.5",
     "claude-sonnet-4",
-    "gpt-5",
+    "gemini-3-pro",
+    # --- Efficient (0.33x) ---
     "gpt-5.4-mini",
-    "gpt-5.2",
-    "o4-mini",
+    "gpt-5.1-codex-mini",
+    "claude-haiku-4.5",
+    # --- Free (0x) ---
+    "gpt-5-mini",
+    "gpt-4.1",
 ]
 
 EFFORT_OPTIONS = [
