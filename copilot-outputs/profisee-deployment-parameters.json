@@ -1,0 +1,36 @@
+# PROFISEE Multi-Agent MDM System - Deployment Parameters
+# Partner: PROFISEE
+# Use Case: Multi-Agent Master Data Management System
+# Author: Arturo Quiroga, Partner Solutions Architect
+# Date: March 2026
+
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "resourcePrefix": {
+      "value": "profisee-mdm"
+    },
+    "location": {
+      "value": "East US 2"
+    },
+    "environment": {
+      "value": "dev"
+    },
+    "openAiSku": {
+      "value": "S0"
+    },
+    "searchSku": {
+      "value": "basic"
+    },
+    "cosmosDbSku": {
+      "value": "Standard"
+    },
+    "sqlAdministratorLogin": {
+      "value": "profiseeadmin"
+    },
+    "sqlAdministratorPassword": {
+      "value": "P@ssw0rd123!"
+    }
+  }
+}

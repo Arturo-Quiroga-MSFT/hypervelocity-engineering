@@ -16,8 +16,36 @@ import streamlit as st
 OUTPUTS_DIR = Path(__file__).parent / "outputs"
 
 # ---------------------------------------------------------------------------
+# Copilot CLI model and effort options (v1.0.10+)
+# ---------------------------------------------------------------------------
+
+MODEL_OPTIONS = [
+    "(default)",
+    "claude-sonnet-4.5",
+    "claude-sonnet-4",
+    "gpt-5",
+    "gpt-5.4-mini",
+    "gpt-5.2",
+    "o4-mini",
+]
+
+EFFORT_OPTIONS = [
+    "(default)",
+    "low",
+    "medium",
+    "high",
+    "xhigh",
+]
+
+# ---------------------------------------------------------------------------
 # Data: Quick Start definitions
 # ---------------------------------------------------------------------------
+
+# Each step carries a generic ``prompt`` (used when no partner context is
+# provided) and a ``contextual_prompt`` template with a ``{context}``
+# placeholder.  When the sidebar "Partner Context" is filled in, prompts
+# auto-populate with the engagement details so all 7 steps follow a single
+# coherent narrative.
 
 PHASES = [
     {
@@ -42,6 +70,14 @@ PHASES = [
                     "(MAF) and Microsoft Foundry Agent Services (pro code). "
                     "I primarily work with Python and C#."
                 ),
+                "contextual_prompt": (
+                    "Remember that I am a Partner Solutions Architect. I help "
+                    "partners build apps and services on Azure AI services. "
+                    "My AI agents are built with Microsoft Agent Framework "
+                    "(MAF) and Microsoft Foundry Agent Services (pro code). "
+                    "I primarily work with Python and C#. "
+                    "My current partner engagement: {context}"
+                ),
                 "agent": "Memory",
                 "doc_link": "hve-quick-start-1-memory.md",
             },
@@ -60,6 +96,14 @@ PHASES = [
                     "OpenAI for a RAG pattern. Include current SDK versions "
                     "for Python, key limitations, recommended indexing "
                     "strategies, and a simple architecture overview."
+                ),
+                "contextual_prompt": (
+                    "I am preparing for a partner call. Partner context: "
+                    "{context}. Research the Azure services and integration "
+                    "patterns most relevant to this engagement. Include "
+                    "current SDK versions for Python, key limitations, "
+                    "recommended architecture patterns, and a simple "
+                    "architecture overview."
                 ),
                 "agent": "Researcher Subagent",
                 "doc_link": "hve-quick-start-2-researcher.md",
@@ -81,6 +125,12 @@ PHASES = [
                     "(RAG pattern), Azure Blob Storage for storing knowledge "
                     "base documents, and Azure App Service for hosting the "
                     "web frontend. Users interact through a browser."
+                ),
+                "contextual_prompt": (
+                    "Create an architecture diagram for the following "
+                    "partner engagement: {context}. Identify the Azure "
+                    "services involved and show the data flow between "
+                    "components. Output a Mermaid diagram."
                 ),
                 "agent": "arch-diagram-builder",
                 "doc_link": "hve-quick-start-3-architecture-diagram.md",
@@ -110,6 +160,13 @@ PHASES = [
                     "don't have a dedicated ML ops team to maintain a "
                     "self-hosted deployment."
                 ),
+                "contextual_prompt": (
+                    "Write an Architecture Decision Record (ADR) for "
+                    "a key technology decision in this partner engagement: "
+                    "{context}. Identify the most important architecture "
+                    "choice, list the alternatives considered, and document "
+                    "the rationale for the chosen approach."
+                ),
                 "agent": "adr-creation",
                 "doc_link": "hve-quick-start-4-adr.md",
             },
@@ -132,6 +189,13 @@ PHASES = [
                     "Display the answer and show the source documents with "
                     "relevance scores below it."
                 ),
+                "contextual_prompt": (
+                    "Create a Streamlit demo dashboard for this partner "
+                    "engagement: {context}. The dashboard should showcase "
+                    "the core functionality the partner needs. Include "
+                    "interactive inputs, mock data, and a clean UI that "
+                    "the partner can see in a live demo."
+                ),
                 "agent": "gen-streamlit-dashboard",
                 "doc_link": "hve-quick-start-5-demo-dashboard.md",
             },
@@ -151,6 +215,13 @@ PHASES = [
                     "(Basic tier), an Azure Blob Storage account, and an "
                     "App Service plan with a Linux web app. All in East US "
                     "2, with a common resource group."
+                ),
+                "contextual_prompt": (
+                    "Generate Bicep to provision the Azure resources needed "
+                    "for this partner engagement: {context}. Infer the "
+                    "required services from the use case, set appropriate "
+                    "tiers, and place them in a common resource group in "
+                    "East US 2."
                 ),
                 "agent": "Azure IaC Generator",
                 "doc_link": "hve-quick-start-6-iac-generator.md",
@@ -180,6 +251,13 @@ PHASES = [
                     "for AI-specific risks like prompt injection and data "
                     "leakage in the RAG pipeline."
                 ),
+                "contextual_prompt": (
+                    "Review this project for security issues before "
+                    "production deployment. The partner engagement: "
+                    "{context}. Focus on OWASP Top 10 risks, secrets "
+                    "management, and any AI-specific risks like prompt "
+                    "injection or data leakage relevant to this use case."
+                ),
                 "agent": "PR Review",
                 "doc_link": "hve-quick-start-7-security-review.md",
             },
@@ -203,19 +281,31 @@ def copilot_cli_available() -> bool:
 
 
 def build_cli_command(
-    prompt: str, *, allow_all: bool = False
+    prompt: str,
+    *,
+    allow_all: bool = False,
+    model: str = "",
+    effort: str = "",
 ) -> str:
     """Return a ready-to-run Copilot CLI command string."""
     escaped = prompt.replace('"', '\\"')
-    allow = " --allow-all-tools" if allow_all else ""
-    return (
-        f'copilot -p "{escaped}"'
-        f' --add-dir copilot-outputs{allow}'
-    )
+    parts = [f'copilot -p "{escaped}"', "--add-dir copilot-outputs"]
+    if model and model != "(default)":
+        parts.append(f"--model {model}")
+    if effort and effort != "(default)":
+        parts.append(f"--effort {effort}")
+    if allow_all:
+        parts.append("--allow-all-tools")
+    return " ".join(parts)
 
 
 def stream_copilot_cli(
-    prompt: str, container, *, allow_all: bool = True
+    prompt: str,
+    container,
+    *,
+    allow_all: bool = True,
+    model: str = "",
+    effort: str = "",
 ):
     """Execute a prompt via Copilot CLI, streaming output into *container*.
 
@@ -232,6 +322,10 @@ def stream_copilot_cli(
         f"{prompt} Save any generated files to the copilot-outputs/ directory.",
         "--add-dir", str(COPILOT_OUTPUTS_DIR),
     ]
+    if model and model != "(default)":
+        cmd.extend(["--model", model])
+    if effort and effort != "(default)":
+        cmd.extend(["--effort", effort])
     if allow_all:
         cmd.append("--allow-all-tools")
 
@@ -250,6 +344,19 @@ def stream_copilot_cli(
     proc.wait()
     full = "".join(lines)
     return proc.returncode, full
+
+
+# ---------------------------------------------------------------------------
+# Prompt generation
+# ---------------------------------------------------------------------------
+
+
+def get_default_prompt(step: dict, partner_context: str) -> str:
+    """Return the default prompt for a step, contextualized when possible."""
+    ctx = partner_context.strip()
+    if ctx and "contextual_prompt" in step:
+        return step["contextual_prompt"].format(context=ctx)
+    return step["prompt"]
 
 
 # ---------------------------------------------------------------------------
@@ -329,22 +436,46 @@ def render_step_card(step: dict, progress: dict) -> dict:
 
         st.markdown(step["description"])
 
-        # Expandable prompt section — three delivery modes
+        partner_context = progress.get("partner_context", "")
+        default_prompt = get_default_prompt(step, partner_context)
+
+        if partner_context:
+            st.caption(
+                "📌 Prompt tailored to your partner context. "
+                "Edit below to refine."
+            )
+
+        # Editable prompt — shared across all delivery tabs
+        active_prompt = st.text_area(
+            "Prompt",
+            value=default_prompt,
+            height=120,
+            key=f"edited_prompt_{step_id}",
+            label_visibility="collapsed",
+        )
+
+        # Three delivery mode tabs
         tab_chat, tab_cli, tab_run = st.tabs(
             ["💬 VS Code Chat", "⌨️ Copilot CLI", "▶️ Run Now"]
         )
 
-        cli_cmd = build_cli_command(step["prompt"], allow_all=True)
-
         with tab_chat:
-            st.code(step["prompt"], language="text")
+            st.code(active_prompt, language="text")
             st.caption(f"Agent: **{step['agent']}**")
 
         with tab_cli:
+            _model = progress.get("cli_model", "(default)")
+            _effort = progress.get("cli_effort", "(default)")
+            cli_cmd = build_cli_command(
+                active_prompt,
+                allow_all=True,
+                model=_model,
+                effort=_effort,
+            )
             st.code(cli_cmd, language="bash")
             st.caption(
                 "Paste into your terminal. Requires "
-                "`copilot` CLI — "
+                "`copilot` CLI v1.0.10+ — "
                 "[install guide]"
                 "(https://docs.github.com/en/copilot/"
                 "how-tos/copilot-cli/cli-getting-started)"
@@ -367,6 +498,8 @@ def render_step_card(step: dict, progress: dict) -> dict:
                     icon="⚠️",
                 )
             else:
+                run_model = progress.get("cli_model", "(default)")
+                run_effort = progress.get("cli_effort", "(default)")
                 allow_all = st.checkbox(
                     "Auto-approve tool actions",
                     value=True,
@@ -378,6 +511,12 @@ def render_step_card(step: dict, progress: dict) -> dict:
                         "execution)."
                     ),
                 )
+                if run_model != "(default)" or run_effort != "(default)":
+                    st.caption(
+                        f"Model: **{run_model}** | "
+                        f"Effort: **{run_effort}** "
+                        "(change in sidebar)"
+                    )
                 if st.button(
                     f"🚀 Run Step {step_id} via Copilot CLI",
                     key=f"run_cli_{step_id}",
@@ -388,9 +527,11 @@ def render_step_card(step: dict, progress: dict) -> dict:
                         f"Running step {step_id} — streaming output..."
                     ):
                         rc, output = stream_copilot_cli(
-                            step["prompt"],
+                            active_prompt,
                             output_box,
                             allow_all=allow_all,
+                            model=run_model,
+                            effort=run_effort,
                         )
                     if rc == 0:
                         st.success("Copilot CLI completed.")
@@ -410,7 +551,7 @@ def render_step_card(step: dict, progress: dict) -> dict:
                         f"**Agent:** {step['agent']}  \n"
                         f"**Date:** {ts}  \n\n"
                         f"## Prompt\n\n"
-                        f"{step['prompt']}\n\n"
+                        f"{active_prompt}\n\n"
                         f"## Output\n\n"
                         f"```\n{saved_output}\n```\n"
                     )
@@ -497,14 +638,30 @@ def render_sidebar(progress: dict) -> dict:
             save_progress(progress)
 
         context = st.text_area(
-            "Partner Context (optional)",
+            "Partner Context",
             value=progress.get("partner_context", ""),
-            placeholder="e.g., Working with Contoso on a RAG app",
-            height=80,
+            placeholder=(
+                "Describe your partner engagement here. This text "
+                "flows into every prompt so all 7 steps stay focused "
+                "on the same use case.\n\n"
+                "Example: Working with Contoso on a multi-agent MDM "
+                "system using Azure OpenAI and Azure AI Search for "
+                "data quality validation."
+            ),
+            height=140,
+            help=(
+                "All step prompts auto-adapt to this context. "
+                "Leave blank to use the generic sample prompts."
+            ),
         )
         if context != progress.get("partner_context", ""):
             progress["partner_context"] = context
             save_progress(progress)
+
+        if context:
+            st.success("Prompts tailored to your context", icon="📌")
+        else:
+            st.info("Add context to personalize prompts", icon="💡")
 
         st.divider()
 
@@ -531,14 +688,50 @@ def render_sidebar(progress: dict) -> dict:
         # Copilot CLI status
         st.subheader("Copilot CLI")
         if copilot_cli_available():
-            st.success("Detected on PATH", icon="✅")
+            st.success("v1.0.10 detected", icon="✅")
         else:
             st.warning("Not found", icon="⚠️")
             st.caption(
-                "Install: `brew install copilot-cli` "
+                "Install: "
+                "`curl -fsSL https://gh.io/copilot-install | bash` "
                 "([docs](https://docs.github.com/en/copilot/"
                 "how-tos/copilot-cli/cli-getting-started))"
             )
+
+        # Model and effort selectors
+        st.subheader("Model & Effort")
+        sel_model = st.selectbox(
+            "Model",
+            MODEL_OPTIONS,
+            index=MODEL_OPTIONS.index(
+                progress.get("cli_model", "(default)")
+            ),
+            key="sidebar_model",
+            help=(
+                "AI model for Copilot CLI. Default is "
+                "Claude Sonnet 4.5. Use /model in interactive "
+                "mode to see all available models."
+            ),
+        )
+        sel_effort = st.selectbox(
+            "Reasoning Effort",
+            EFFORT_OPTIONS,
+            index=EFFORT_OPTIONS.index(
+                progress.get("cli_effort", "(default)")
+            ),
+            key="sidebar_effort",
+            help=(
+                "How deeply the model reasons. Low is faster "
+                "and cheaper; high/xhigh is slower but more "
+                "thorough. Maps to --effort flag."
+            ),
+        )
+        if sel_model != progress.get("cli_model", "(default)"):
+            progress["cli_model"] = sel_model
+            save_progress(progress)
+        if sel_effort != progress.get("cli_effort", "(default)"):
+            progress["cli_effort"] = sel_effort
+            save_progress(progress)
 
         st.divider()
         st.caption(
