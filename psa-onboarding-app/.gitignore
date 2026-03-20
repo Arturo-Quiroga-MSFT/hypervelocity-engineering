@@ -1,6 +1,9 @@
 # Progress tracking (local only)
 .psa_progress.json
 
+# Saved CLI outputs
+outputs/
+
 # Python
 __pycache__/
 *.pyc

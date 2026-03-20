@@ -8,9 +8,12 @@ lifecycle: Configure → Learn → Visualize → Document → Demo → Deploy �
 import json
 import shutil
 import subprocess
+from datetime import datetime, timezone
 from pathlib import Path
 
 import streamlit as st
+
+OUTPUTS_DIR = Path(__file__).parent / "outputs"
 
 # ---------------------------------------------------------------------------
 # Data: Quick Start definitions
@@ -383,6 +386,43 @@ def render_step_card(step: dict, progress: dict) -> dict:
                     else:
                         st.error(f"Copilot CLI exited with code {rc}.")
                     output_box.code(output, language="markdown")
+                    # Store output in session state for the save button
+                    st.session_state[f"output_{step_id}"] = output
+
+                # Save button — available whenever output exists
+                if f"output_{step_id}" in st.session_state:
+                    saved_output = st.session_state[f"output_{step_id}"]
+                    ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+                    filename = f"step-{step_id}-{ts}.md"
+                    md_content = (
+                        f"# Step {step_id}: {step['title']}\n\n"
+                        f"**Agent:** {step['agent']}  \n"
+                        f"**Date:** {ts}  \n\n"
+                        f"## Prompt\n\n"
+                        f"{step['prompt']}\n\n"
+                        f"## Output\n\n"
+                        f"```\n{saved_output}\n```\n"
+                    )
+                    save_col, dl_col = st.columns(2)
+                    with save_col:
+                        if st.button(
+                            f"💾 Save to outputs/",
+                            key=f"save_{step_id}",
+                            use_container_width=True,
+                        ):
+                            OUTPUTS_DIR.mkdir(exist_ok=True)
+                            out_path = OUTPUTS_DIR / filename
+                            out_path.write_text(md_content)
+                            st.success(f"Saved to `{out_path.name}`")
+                    with dl_col:
+                        st.download_button(
+                            "⬇️ Download .md",
+                            data=md_content,
+                            file_name=filename,
+                            mime="text/markdown",
+                            key=f"dl_{step_id}",
+                            use_container_width=True,
+                        )
 
         # Action buttons
         btn_col1, btn_col2, btn_col3 = st.columns(3)
