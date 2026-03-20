@@ -146,18 +146,26 @@ def list_steps() -> None:
     )
 
 
-def run_step(step_id: int, *, verbose: bool = False) -> int:
+def run_step(
+    step_id: int, *, verbose: bool = False, allow_all: bool = True
+) -> int:
     """Run a single step via Copilot CLI. Returns the exit code."""
     step = STEPS[step_id]
     print(f"\n{'='*60}")
     print(f"  Step {step_id}: {step['title']}")
     print(f"  Agent: {step['agent']}")
+    if allow_all:
+        print("  Mode: --allow-all-tools (auto-approve actions)")
     print(f"{'='*60}\n")
 
     repo_root = Path(__file__).parent.parent
 
+    cmd = ["copilot", "-p", step["prompt"]]
+    if allow_all:
+        cmd.append("--allow-all-tools")
+
     result = subprocess.run(
-        ["copilot", "-p", step["prompt"]],
+        cmd,
         text=True,
         cwd=repo_root,
     )
@@ -205,6 +213,11 @@ def main() -> None:
         action="store_true",
         help="Show full Copilot CLI output (uses -p instead of -sp)",
     )
+    parser.add_argument(
+        "--no-allow-all",
+        action="store_true",
+        help="Disable --allow-all-tools (Copilot will pause for permission)",
+    )
 
     args = parser.parse_args()
 
@@ -221,7 +234,11 @@ def main() -> None:
     if args.all:
         print("Running all 7 HVE Quick Start steps...\n")
         for sid in STEPS:
-            rc = run_step(sid, verbose=args.verbose)
+            rc = run_step(
+                sid,
+                verbose=args.verbose,
+                allow_all=not args.no_allow_all,
+            )
             if rc != 0:
                 print(
                     f"\nStep {sid} failed (exit {rc}). "
@@ -233,7 +250,11 @@ def main() -> None:
                     sys.exit(rc)
         print("\nAll 7 steps complete.")
     else:
-        rc = run_step(args.step, verbose=args.verbose)
+        rc = run_step(
+            args.step,
+            verbose=args.verbose,
+            allow_all=not args.no_allow_all,
+        )
         sys.exit(rc)
 
 

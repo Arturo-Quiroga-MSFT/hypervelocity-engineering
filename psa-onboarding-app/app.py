@@ -197,19 +197,32 @@ def copilot_cli_available() -> bool:
     return shutil.which("copilot") is not None
 
 
-def build_cli_command(prompt: str, *, silent: bool = True) -> str:
+def build_cli_command(
+    prompt: str, *, allow_all: bool = False
+) -> str:
     """Return a ready-to-run Copilot CLI command string."""
     escaped = prompt.replace('"', '\\"')
-    return f'copilot -p "{escaped}"'
+    allow = " --allow-all-tools" if allow_all else ""
+    return f'copilot -p "{escaped}"{allow}'
 
 
-def stream_copilot_cli(prompt: str, container):
+def stream_copilot_cli(
+    prompt: str, container, *, allow_all: bool = True
+):
     """Execute a prompt via Copilot CLI, streaming output into *container*.
+
+    When *allow_all* is True the ``--allow-all-tools`` flag is passed so
+    Copilot does not pause for permission prompts (required for
+    non-interactive execution from a web UI).
 
     Returns (returncode, full_output).
     """
+    cmd = ["copilot", "-p", prompt]
+    if allow_all:
+        cmd.append("--allow-all-tools")
+
     proc = subprocess.Popen(
-        ["copilot", "-p", prompt],
+        cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
@@ -307,7 +320,7 @@ def render_step_card(step: dict, progress: dict) -> dict:
             ["💬 VS Code Chat", "⌨️ Copilot CLI", "▶️ Run Now"]
         )
 
-        cli_cmd = build_cli_command(step["prompt"])
+        cli_cmd = build_cli_command(step["prompt"], allow_all=True)
 
         with tab_chat:
             st.code(step["prompt"], language="text")
@@ -327,6 +340,10 @@ def render_step_card(step: dict, progress: dict) -> dict:
                 "`python cli.py --step "
                 f"{step_id}`"
             )
+            st.caption(
+                "`--allow-all-tools` lets Copilot run commands "
+                "without pausing for permission."
+            )
 
         with tab_run:
             if not copilot_cli_available():
@@ -336,6 +353,17 @@ def render_step_card(step: dict, progress: dict) -> dict:
                     icon="⚠️",
                 )
             else:
+                allow_all = st.checkbox(
+                    "Auto-approve tool actions",
+                    value=True,
+                    key=f"allow_all_{step_id}",
+                    help=(
+                        "When checked, passes --allow-all-tools so "
+                        "Copilot CLI runs commands without pausing "
+                        "for permission (required for non-interactive "
+                        "execution)."
+                    ),
+                )
                 if st.button(
                     f"🚀 Run Step {step_id} via Copilot CLI",
                     key=f"run_cli_{step_id}",
@@ -346,7 +374,9 @@ def render_step_card(step: dict, progress: dict) -> dict:
                         f"Running step {step_id} — streaming output..."
                     ):
                         rc, output = stream_copilot_cli(
-                            step["prompt"], output_box
+                            step["prompt"],
+                            output_box,
+                            allow_all=allow_all,
                         )
                     if rc == 0:
                         st.success("Copilot CLI completed.")
