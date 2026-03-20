@@ -159,8 +159,14 @@ def run_step(
     print(f"{'='*60}\n")
 
     repo_root = Path(__file__).parent.parent
+    outputs_dir = repo_root / "copilot-outputs"
+    outputs_dir.mkdir(exist_ok=True)
 
-    cmd = ["copilot", "-p", step["prompt"]]
+    cmd = [
+        "copilot", "-p",
+        f"{step['prompt']} Save any generated files to the copilot-outputs/ directory.",
+        "--add-dir", str(outputs_dir),
+    ]
     if allow_all:
         cmd.append("--allow-all-tools")
 

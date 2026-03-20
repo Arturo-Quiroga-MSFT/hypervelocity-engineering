@@ -188,6 +188,8 @@ PHASES = [
 ]
 
 PROGRESS_FILE = Path(__file__).parent / ".psa_progress.json"
+REPO_ROOT = Path(__file__).parent.parent
+COPILOT_OUTPUTS_DIR = REPO_ROOT / "copilot-outputs"
 
 
 # ---------------------------------------------------------------------------
@@ -206,7 +208,10 @@ def build_cli_command(
     """Return a ready-to-run Copilot CLI command string."""
     escaped = prompt.replace('"', '\\"')
     allow = " --allow-all-tools" if allow_all else ""
-    return f'copilot -p "{escaped}"{allow}'
+    return (
+        f'copilot -p "{escaped}"'
+        f' --add-dir copilot-outputs{allow}'
+    )
 
 
 def stream_copilot_cli(
@@ -220,7 +225,13 @@ def stream_copilot_cli(
 
     Returns (returncode, full_output).
     """
-    cmd = ["copilot", "-p", prompt]
+    COPILOT_OUTPUTS_DIR.mkdir(exist_ok=True)
+
+    cmd = [
+        "copilot", "-p",
+        f"{prompt} Save any generated files to the copilot-outputs/ directory.",
+        "--add-dir", str(COPILOT_OUTPUTS_DIR),
+    ]
     if allow_all:
         cmd.append("--allow-all-tools")
 
@@ -230,7 +241,7 @@ def stream_copilot_cli(
         stderr=subprocess.STDOUT,
         text=True,
         bufsize=1,
-        cwd=Path(__file__).parent.parent,  # repo root
+        cwd=REPO_ROOT,
     )
     lines: list[str] = []
     for line in proc.stdout:              # type: ignore[union-attr]
