@@ -91,4 +91,4 @@ graph TD
 
 ---
 
-*Part 1 of 6 in the HVE Quick Start series for Partner Solutions Architects*
+*Part 1 of 7 in the HVE Quick Start series for Partner Solutions Architects*

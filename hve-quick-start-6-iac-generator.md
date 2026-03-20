@@ -144,10 +144,10 @@ terraform apply tfplan
 
 ## Next Steps
 
-* You have completed the full HVE Quick Start series. You can now configure your tools, research topics, produce diagrams, document decisions, build demos, and deploy infrastructure.
-* Explore the full [HVE Core Use Cases for PSAs](hve-core-use-cases-for-psa.md) for advanced workflows including the RPI (Research, Plan, Implement) methodology, custom agent creation, and more.
+* Try [Quick Start 7: Review Your Partner's Code for Security](hve-quick-start-7-security-review.md) to catch vulnerabilities before production.
 * Return to the [Quick Start Series README](README.md) for the full learning path.
+* Explore the full [HVE Core Use Cases for PSAs](hve-core-use-cases-for-psa.md) for advanced workflows including the RPI (Research, Plan, Implement) methodology, custom agent creation, and more.
 
 ---
 
-*Part 6 of 6 in the HVE Quick Start series for Partner Solutions Architects*
+*Part 6 of 7 in the HVE Quick Start series for Partner Solutions Architects*

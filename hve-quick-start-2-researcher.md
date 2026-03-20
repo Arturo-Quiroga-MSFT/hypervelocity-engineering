@@ -124,4 +124,4 @@ One prompt in, structured briefing out. The researcher handles the tab-hopping s
 
 ---
 
-*Part 2 of 6 in the HVE Quick Start series for Partner Solutions Architects*
+*Part 2 of 7 in the HVE Quick Start series for Partner Solutions Architects*

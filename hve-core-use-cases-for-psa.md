@@ -10,7 +10,7 @@
 
 ## What Is HVE Core?
 
-Hypervelocity Engineering (HVE) Core is an **enterprise-ready prompt engineering framework for GitHub Copilot**. It provides 35 specialized agents, 68 coding instructions, 40 reusable prompts, and 2 skill packages — all with JSON schema validation and CI/CD enforcement.
+Hypervelocity Engineering (HVE) Core is an **enterprise-ready prompt engineering framework for GitHub Copilot**. It provides 34 specialized agents, 68 coding instructions, 40 reusable prompts, and 3 skill packages — all with JSON schema validation and CI/CD enforcement.
 
 The core methodology is **RPI (Research → Plan → Implement)** — a structured workflow where AI operates under explicit constraints rather than guessing. This changes the optimization target from "plausible code" to "verified truth."
 

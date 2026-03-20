@@ -140,4 +140,4 @@ The agent updates the code while preserving the existing functionality.
 
 ---
 
-*Part 5 of 6 in the HVE Quick Start series for Partner Solutions Architects*
+*Part 5 of 7 in the HVE Quick Start series for Partner Solutions Architects*

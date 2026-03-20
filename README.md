@@ -16,9 +16,9 @@ estimated_reading_time: 3
 
 ## Overview
 
-This series provides six focused, beginner-friendly guides for Partner Solutions Architects (PSAs) to get productive with [HVE Core](https://github.com/microsoft/hve-core) quickly. Each guide solves a real daily problem, requires minimal effort, and produces an immediate, tangible result.
+This series provides seven focused, beginner-friendly guides for Partner Solutions Architects (PSAs) to get productive with [HVE Core](https://github.com/microsoft/hve-core) quickly. Each guide solves a real daily problem, requires minimal effort, and produces an immediate, tangible result.
 
-The full series takes under 20 minutes. You can work through them in order or jump to whichever fits your current need.
+The full series takes under 25 minutes. You can work through them in order or jump to whichever fits your current need.
 
 ## Prerequisites
 
@@ -27,7 +27,7 @@ The full series takes under 20 minutes. You can work through them in order or ju
 
 ## The Learning Path
 
-The six quick starts follow a natural progression through a partner engagement:
+The seven quick starts follow a natural progression through a partner engagement:
 
 ```mermaid
 graph LR
@@ -41,16 +41,23 @@ graph LR
         QS5 --> QS6["6. IaC\nGenerator (5 min)"]
     end
 
+    subgraph phase3 ["Secure"]
+        QS7["7. Security\nReview (5 min)"]
+    end
+
     QS3 --> QS4
+    QS6 --> QS7
 
     style phase1 fill:#E3F2FD,stroke:#1E88E5,color:#000
     style phase2 fill:#FFF3E0,stroke:#FB8C00,color:#000
+    style phase3 fill:#FFEBEE,stroke:#E53935,color:#000
     style QS1 fill:#4FC3F7,stroke:#0288D1,color:#000
     style QS2 fill:#4FC3F7,stroke:#0288D1,color:#000
     style QS3 fill:#4FC3F7,stroke:#0288D1,color:#000
     style QS4 fill:#FFB74D,stroke:#FB8C00,color:#000
     style QS5 fill:#FFB74D,stroke:#FB8C00,color:#000
     style QS6 fill:#FFB74D,stroke:#FB8C00,color:#000
+    style QS7 fill:#EF5350,stroke:#C62828,color:#fff
 ```
 
 ## Quick Start Guides
@@ -63,6 +70,7 @@ graph LR
 | 4 | [Document Your Architecture Decisions](hve-quick-start-4-adr.md) | Describe a decision you made | Formal decision record | 2 min |
 | 5 | [Build a Partner Demo Dashboard](hve-quick-start-5-demo-dashboard.md) | Describe what to demo | Runnable Streamlit app | 5 min |
 | 6 | [Scaffold Azure Resources as Code](hve-quick-start-6-iac-generator.md) | Describe Azure resources needed | Deployable Bicep/Terraform | 5 min |
+| 7 | [Review Code for Security](hve-quick-start-7-security-review.md) | Point at partner code | Severity-graded security findings | 5 min |
 
 ## Phase 1: Configure, Learn, Visualize
 
@@ -79,6 +87,12 @@ These three guides produce partner-facing deliverables:
 * **Quick Start 4** captures architecture decisions (Azure OpenAI vs. self-hosted, Cosmos DB vs. SQL) in a standard format so the rationale is never lost.
 * **Quick Start 5** generates runnable demo dashboards you can screenshare with partners, turning "let me explain" into "let me show you."
 * **Quick Start 6** scaffolds the Azure infrastructure your partner needs as deployable Bicep or Terraform, teaching IaC best practices from day one.
+
+## Phase 3: Secure
+
+The final guide ensures quality before go-live:
+
+* **Quick Start 7** reviews the partner's code and infrastructure for OWASP Top 10 vulnerabilities, AI-specific risks like prompt injection, and common Azure security misconfigurations. Catching these before production protects the partner and your credibility.
 
 ## Going Deeper
 

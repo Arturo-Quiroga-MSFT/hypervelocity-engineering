@@ -131,4 +131,4 @@ OpenAI. Keeping everything in Azure simplifies networking and compliance.
 
 ---
 
-*Part 4 of 6 in the HVE Quick Start series for Partner Solutions Architects*
+*Part 4 of 7 in the HVE Quick Start series for Partner Solutions Architects*
