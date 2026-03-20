@@ -203,17 +203,26 @@ def build_cli_command(prompt: str, *, silent: bool = True) -> str:
     return f'copilot -p "{escaped}"'
 
 
-def run_copilot_cli(prompt: str) -> tuple[int, str]:
-    """Execute a prompt via Copilot CLI and return (returncode, output)."""
-    result = subprocess.run(
+def stream_copilot_cli(prompt: str, container):
+    """Execute a prompt via Copilot CLI, streaming output into *container*.
+
+    Returns (returncode, full_output).
+    """
+    proc = subprocess.Popen(
         ["copilot", "-p", prompt],
-        capture_output=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
         text=True,
-        timeout=120,
+        bufsize=1,
         cwd=Path(__file__).parent.parent,  # repo root
     )
-    output = result.stdout or result.stderr
-    return result.returncode, output
+    lines: list[str] = []
+    for line in proc.stdout:              # type: ignore[union-attr]
+        lines.append(line)
+        container.code("".join(lines), language="markdown")
+    proc.wait()
+    full = "".join(lines)
+    return proc.returncode, full
 
 
 # ---------------------------------------------------------------------------
@@ -332,15 +341,18 @@ def render_step_card(step: dict, progress: dict) -> dict:
                     key=f"run_cli_{step_id}",
                     use_container_width=True,
                 ):
+                    output_box = st.empty()
                     with st.spinner(
-                        f"Running step {step_id} via Copilot CLI..."
+                        f"Running step {step_id} — streaming output..."
                     ):
-                        rc, output = run_copilot_cli(step["prompt"])
+                        rc, output = stream_copilot_cli(
+                            step["prompt"], output_box
+                        )
                     if rc == 0:
                         st.success("Copilot CLI completed.")
                     else:
                         st.error(f"Copilot CLI exited with code {rc}.")
-                    st.code(output, language="markdown")
+                    output_box.code(output, language="markdown")
 
         # Action buttons
         btn_col1, btn_col2, btn_col3 = st.columns(3)
