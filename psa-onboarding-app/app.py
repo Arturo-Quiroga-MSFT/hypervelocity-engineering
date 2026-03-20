@@ -66,8 +66,8 @@ EFFORT_OPTIONS = [
 PHASES = [
     {
         "name": "Configure → Learn → Visualize",
-        "color": "#E3F2FD",
-        "border": "#1E88E5",
+        "color": "#0D2137",
+        "border": "#58A6FF",
         "steps": [
             {
                 "id": 1,
@@ -155,8 +155,8 @@ PHASES = [
     },
     {
         "name": "Document → Demo → Deploy",
-        "color": "#FFF3E0",
-        "border": "#FB8C00",
+        "color": "#2A1800",
+        "border": "#F0883E",
         "steps": [
             {
                 "id": 4,
@@ -246,8 +246,8 @@ PHASES = [
     },
     {
         "name": "Secure",
-        "color": "#FFEBEE",
-        "border": "#E53935",
+        "color": "#2D0E0E",
+        "border": "#F85149",
         "steps": [
             {
                 "id": 7,
