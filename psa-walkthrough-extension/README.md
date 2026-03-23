@@ -48,24 +48,23 @@ This extension replaces that scattered workflow with a single guided walkthrough
 
 ## How It Works
 
-```text
-┌─────────────────────────────────────────────────────────────────────┐
-│                    VS Code Getting Started Tab                      │
-│                                                                     │
-│  ┌───────────────────────────────────────────────────────────────┐  │
-│  │              PSA Onboarding Walkthrough                       │  │
-│  │                                                               │  │
-│  │   Step 1 ─► Step 2 ─► Step 3 ─► Step 4 ─► ... ─► Step 7    │  │
-│  │     │         │         │         │                   │       │  │
-│  │     ▼         ▼         ▼         ▼                   ▼       │  │
-│  │  @memory  @researcher @arch    @adr              @pr-review  │  │
-│  │              -subagent  -diagram  -creation                   │  │
-│  └───────────────────────────────────────────────────────────────┘  │
-│                              │                                      │
-│                              ▼                                      │
-│                     Copilot Chat Panel                               │
-│              (agent + prompt pre-filled)                             │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph VSCode["VS Code Getting Started Tab"]
+        subgraph Walkthrough["PSA Onboarding Walkthrough"]
+            S1["Step 1\n@memory"] --> S2["Step 2\n@researcher-subagent"]
+            S2 --> S3["Step 3\n@arch-diagram-builder"]
+            S3 --> S4["Step 4\n@adr-creation"]
+            S4 --> S5["Step 5\n@gen-streamlit-dashboard"]
+            S5 --> S6["Step 6\n@azure-iac-generator"]
+            S6 --> S7["Step 7\n@pr-review"]
+        end
+    end
+    S1 & S2 & S3 & S4 & S5 & S6 & S7 --> Chat["Copilot Chat Panel\n(agent + prompt pre-filled)"]
+
+    style VSCode fill:#1e1e1e,stroke:#007acc,color:#fff
+    style Walkthrough fill:#252526,stroke:#007acc,color:#fff
+    style Chat fill:#0e639c,stroke:#007acc,color:#fff
 ```
 
 Each "Run" button opens Copilot Chat with the right agent and a starter prompt. Steps auto-complete when the command executes.
@@ -76,23 +75,45 @@ Each "Run" button opens Copilot Chat with the right agent and a starter prompt. 
 
 The walkthrough follows three phases that mirror a typical partner engagement lifecycle:
 
-```text
-Phase 1                    Phase 2                      Phase 3
-CONFIGURE · LEARN          DOCUMENT · DEMO · DEPLOY     SECURE
-VISUALIZE
+```mermaid
+flowchart LR
+    subgraph P1["Phase 1: Configure · Learn · Visualize"]
+        S1["1 MEMORY\n@memory\n~30s"]
+        S2["2 RESEARCH\n@researcher-subagent\n~2 min"]
+        S3["3 DIAGRAM\n@arch-diagram-builder\n~3 min"]
+        S1 --> S2 --> S3
+    end
+    subgraph P2["Phase 2: Document · Demo · Deploy"]
+        S4["4 ADR\n@adr-creation\n~2 min"]
+        S5["5 DASHBOARD\n@gen-streamlit-dashboard\n~5 min"]
+        S6["6 IaC\n@azure-iac-generator\n~5 min"]
+        S4 --> S5 --> S6
+    end
+    subgraph P3["Phase 3: Secure"]
+        S7["7 SECURITY\n@pr-review\n~5 min"]
+    end
 
-┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
-│ 1 MEMORY │─►│2 RESEARCH│─►│3 DIAGRAM │─►│  4 ADR   │─►│5 DASHBRD │─►│  6 IaC   │─►│7 SECURE  │
-│          │  │          │  │          │  │          │  │          │  │          │  │          │
-│ @memory  │  │@research │  │@arch-dia │  │@adr-crea │  │@gen-stre │  │@azure-ia │  │@pr-revie │
-│          │  │ -subagent│  │ -builder │  │ -tion    │  │ -amlit   │  │ c-gen    │  │ w        │
-│  ~30s    │  │  ~2 min  │  │  ~3 min  │  │  ~2 min  │  │  ~5 min  │  │  ~5 min  │  │  ~5 min  │
-└──────────┘  └──────────┘  └──────────┘  └──────────┘  └──────────┘  └──────────┘  └──────────┘
-     │              │              │              │              │              │              │
-     ▼              ▼              ▼              ▼              ▼              ▼              ▼
-  Identity &     Technical     Mermaid       Decision       Streamlit      Bicep /       OWASP &
-  partner ctx    briefing      diagram       record         demo app       Terraform     AI risk
-                                                                                         findings
+    S3 --> S4
+    S6 --> S7
+
+    S1 -.- O1["Identity &\npartner context"]
+    S2 -.- O2["Technical\nbriefing"]
+    S3 -.- O3["Mermaid\ndiagram"]
+    S4 -.- O4["Decision\nrecord"]
+    S5 -.- O5["Streamlit\ndemo app"]
+    S6 -.- O6["Bicep /\nTerraform"]
+    S7 -.- O7["OWASP &\nAI risk findings"]
+
+    style P1 fill:#264f78,stroke:#007acc,color:#fff
+    style P2 fill:#4b3267,stroke:#c586c0,color:#fff
+    style P3 fill:#4e3a1a,stroke:#ce9178,color:#fff
+    style O1 fill:none,stroke:none,color:#888
+    style O2 fill:none,stroke:none,color:#888
+    style O3 fill:none,stroke:none,color:#888
+    style O4 fill:none,stroke:none,color:#888
+    style O5 fill:none,stroke:none,color:#888
+    style O6 fill:none,stroke:none,color:#888
+    style O7 fill:none,stroke:none,color:#888
 ```
 
 ### Phase 1: Configure, Learn, Visualize
@@ -123,26 +144,18 @@ VISUALIZE
 
 The extension's most powerful feature is automatic context threading. When you set your partner engagement context in Step 1, every subsequent step uses it:
 
-```text
-         ┌─────────────────────────────────────┐
-         │     "Set Partner Context"             │
-         │  Contoso: customer support chatbot    │
-         │  using Azure OpenAI + AI Search       │
-         │  for RAG over insurance claims docs   │
-         └──────────────┬──────────────────────┘
-                        │
-            context = "{context}"
-                        │
-        ┌───────┬───────┼───────┬───────┬───────┐
-        ▼       ▼       ▼       ▼       ▼       ▼
-     Step 2  Step 3  Step 4  Step 5  Step 6  Step 7
-        │       │       │       │       │       │
-        ▼       ▼       ▼       ▼       ▼       ▼
-    Research  Diagram   ADR    Demo    Bicep  Security
-    on RAG    for RAG   for    with    for    review
-    patterns  pipeline  Azure  RAG     OpenAI for RAG
-                        OpenAI chat    + AI   pipeline
-                        choice app     Search
+```mermaid
+flowchart TD
+    CTX["Set Partner Context\n\nContoso: customer support chatbot\nusing Azure OpenAI + AI Search\nfor RAG over insurance claims docs"]
+
+    CTX -->|"context = {context}"| S2["Step 2: Research\nRAG patterns"]
+    CTX -->|"context = {context}"| S3["Step 3: Diagram\nRAG pipeline"]
+    CTX -->|"context = {context}"| S4["Step 4: ADR\nAzure OpenAI choice"]
+    CTX -->|"context = {context}"| S5["Step 5: Demo\nRAG chat app"]
+    CTX -->|"context = {context}"| S6["Step 6: Bicep\nOpenAI + AI Search"]
+    CTX -->|"context = {context}"| S7["Step 7: Security\nRAG pipeline review"]
+
+    style CTX fill:#0e639c,stroke:#007acc,color:#fff
 ```
 
 > [!NOTE]
@@ -194,39 +207,36 @@ npx @vscode/vsce package
 
 ## Architecture
 
-```text
-psa-walkthrough-extension/
-│
-├── package.json              Walkthrough contribution points, commands,
-│                             and step definitions with media references
-│
-├── extension.js              Command handlers with STEP_PROMPTS map
-│                             ├── buildPrompt()   — threads partner context
-│                             ├── sendToChat()    — opens Copilot Chat
-│                             └── activate()      — registers all commands
-│
-└── media/
-    ├── step-1-memory.md      Phase 1: Configure
-    ├── step-2-researcher.md  Phase 1: Learn
-    ├── step-3-arch-diagram.md Phase 1: Visualize
-    ├── step-4-adr.md         Phase 2: Document
-    ├── step-5-dashboard.md   Phase 2: Demo
-    ├── step-6-iac.md         Phase 2: Deploy
-    └── step-7-security.md    Phase 3: Secure
+```mermaid
+flowchart LR
+    subgraph ext["psa-walkthrough-extension/"]
+        PJ["package.json\n\nWalkthrough contribution\npoints, commands, step\ndefinitions + media refs"]
+        EJ["extension.js\n\nbuildPrompt()\nsendToChat()\nactivate()"]
+        subgraph media["media/"]
+            M1["step-1-memory.md"]
+            M2["step-2-researcher.md"]
+            M3["step-3-arch-diagram.md"]
+            M4["step-4-adr.md"]
+            M5["step-5-dashboard.md"]
+            M6["step-6-iac.md"]
+            M7["step-7-security.md"]
+        end
+    end
+
+    style ext fill:#1e1e1e,stroke:#007acc,color:#fff
+    style media fill:#252526,stroke:#555,color:#ccc
 ```
 
 ### Data Flow
 
-```text
-┌──────────────┐     ┌────────────────┐     ┌─────────────────┐
-│  package.json │     │  extension.js  │     │  Copilot Chat   │
-│              │     │                │     │                 │
-│  walkthrough ├────►│  STEP_PROMPTS  ├────►│  @agent +       │
-│  steps +     │     │  + partner     │     │  contextual     │
-│  commands    │     │  context merge │     │  prompt         │
-└──────────────┘     └────────────────┘     └─────────────────┘
-      defines              builds                receives
-      UI steps             final prompt          and executes
+```mermaid
+flowchart LR
+    PJ["package.json\n\nDefines UI steps\nand commands"] --> EJ["extension.js\n\nSTEP_PROMPTS +\npartner context merge\n\nBuilds final prompt"]
+    EJ --> CC["Copilot Chat\n\n@agent + contextual\nprompt\n\nReceives and executes"]
+
+    style PJ fill:#264f78,stroke:#007acc,color:#fff
+    style EJ fill:#4b3267,stroke:#c586c0,color:#fff
+    style CC fill:#0e639c,stroke:#007acc,color:#fff
 ```
 
 ---
@@ -262,19 +272,17 @@ Replace `"markdown"` with `"image"` in any step's media property:
 
 ## Upstream Contribution Path
 
-```text
-  Current State                    Target State
-┌──────────────────┐           ┌──────────────────┐
-│  Standalone VSIX │           │  HVE Core native  │
-│  extension       │──────────►│  walkthrough      │
-│  (this repo)     │           │  (package.json)   │
-└──────────────────┘           └──────────────────┘
-        │                              │
-        ▼                              ▼
-  1. Validate with PSAs         No separate install
-  2. Gather feedback            needed — ships with
-  3. Propose merge into         HVE Core for all PSAs
-     HVE Core package.json
+```mermaid
+flowchart LR
+    Current["Standalone VSIX\nextension\n(this repo)"] -->|"Propose merge"| Target["HVE Core native\nwalkthrough\n(package.json)"]
+
+    Current -.- Steps["1. Validate with PSAs\n2. Gather feedback\n3. Merge into HVE Core"]
+    Target -.- Benefit["No separate install —\nships with HVE Core\nfor all PSAs"]
+
+    style Current fill:#264f78,stroke:#007acc,color:#fff
+    style Target fill:#0e639c,stroke:#007acc,color:#fff
+    style Steps fill:none,stroke:none,color:#888
+    style Benefit fill:none,stroke:none,color:#888
 ```
 
 ---
