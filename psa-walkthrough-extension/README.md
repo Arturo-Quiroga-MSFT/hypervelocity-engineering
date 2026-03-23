@@ -214,7 +214,7 @@ npx @vscode/vsce package
 ## Architecture
 
 ```mermaid
-%%{init: {'theme': 'dark', 'themeVariables': {'lineColor': '#ffffff'}}}%%
+%%{init: {'theme': 'dark', 'themeVariables': {'lineColor': '#ffffff', 'nodeBorder': '#ffcc00', 'clusterBorder': '#007acc'}}}%%
 flowchart LR
     subgraph ext["psa-walkthrough-extension/"]
         PJ["package.json\n\nWalkthrough contribution\npoints, commands, step\ndefinitions + media refs"]
@@ -230,8 +230,17 @@ flowchart LR
         end
     end
 
-    style ext fill:#1e1e1e,stroke:#007acc,color:#fff
-    style media fill:#252526,stroke:#555,color:#ccc
+    style ext fill:#1e1e1e,stroke:#007acc,stroke-width:2px,color:#fff
+    style media fill:#252526,stroke:#ffcc00,stroke-width:2px,color:#ccc
+    style PJ fill:#264f78,stroke:#ffcc00,stroke-width:2px,color:#fff
+    style EJ fill:#4b3267,stroke:#ffcc00,stroke-width:2px,color:#fff
+    style M1 fill:#333,stroke:#ffcc00,stroke-width:1px,color:#ccc
+    style M2 fill:#333,stroke:#ffcc00,stroke-width:1px,color:#ccc
+    style M3 fill:#333,stroke:#ffcc00,stroke-width:1px,color:#ccc
+    style M4 fill:#333,stroke:#ffcc00,stroke-width:1px,color:#ccc
+    style M5 fill:#333,stroke:#ffcc00,stroke-width:1px,color:#ccc
+    style M6 fill:#333,stroke:#ffcc00,stroke-width:1px,color:#ccc
+    style M7 fill:#333,stroke:#ffcc00,stroke-width:1px,color:#ccc
 ```
 
 ### Data Flow
