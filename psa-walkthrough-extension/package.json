@@ -1,0 +1,157 @@
+{
+  "name": "hve-psa-walkthrough",
+  "displayName": "HVE PSA Onboarding Walkthrough",
+  "description": "Guided onboarding walkthrough for Partner Solutions Architects using HVE Core",
+  "version": "0.2.0",
+  "publisher": "ise-hve-essentials",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/microsoft/hve-core"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "hve-psa.openWalkthrough",
+        "title": "Open PSA Onboarding Walkthrough",
+        "category": "HVE"
+      },
+      {
+        "command": "hve-psa.setPartnerContext",
+        "title": "Set Partner Engagement Context",
+        "category": "HVE PSA"
+      },
+      {
+        "command": "hve-psa.step.memory",
+        "title": "Set Your Context (Memory Agent)",
+        "category": "HVE PSA"
+      },
+      {
+        "command": "hve-psa.step.researcher",
+        "title": "Prep for a Partner Call (Researcher)",
+        "category": "HVE PSA"
+      },
+      {
+        "command": "hve-psa.step.archDiagram",
+        "title": "Create Architecture Diagram",
+        "category": "HVE PSA"
+      },
+      {
+        "command": "hve-psa.step.adr",
+        "title": "Document Architecture Decision",
+        "category": "HVE PSA"
+      },
+      {
+        "command": "hve-psa.step.dashboard",
+        "title": "Build Demo Dashboard",
+        "category": "HVE PSA"
+      },
+      {
+        "command": "hve-psa.step.iac",
+        "title": "Scaffold Azure IaC",
+        "category": "HVE PSA"
+      },
+      {
+        "command": "hve-psa.step.security",
+        "title": "Run Security Review",
+        "category": "HVE PSA"
+      }
+    ],
+    "walkthroughs": [
+      {
+        "id": "hve-psa-onboarding",
+        "title": "Get Started as a Partner Solutions Architect",
+        "description": "Seven focused steps to get productive with HVE Core: configure your context, research topics, create diagrams, document decisions, demo to partners, deploy infrastructure, and review security.",
+        "steps": [
+          {
+            "id": "hve-psa.memory",
+            "title": "Set Your Context Once",
+            "description": "Start by describing your current partner engagement. This context threads through all 7 steps so every prompt is tailored to your scenario.\n\n[Set Partner Context](command:hve-psa.setPartnerContext)\n\nThen tell Copilot who you are so every future interaction is grounded in your role.\n\n[Set Your Context](command:hve-psa.step.memory)",
+            "media": {
+              "markdown": "media/step-1-memory.md"
+            },
+            "completionEvents": [
+              "onCommand:hve-psa.step.memory"
+            ]
+          },
+          {
+            "id": "hve-psa.researcher",
+            "title": "Prep for a Partner Call",
+            "description": "Get a structured technical briefing on any Azure AI topic before a partner call. The Researcher subagent searches docs, repos, and web sources to produce a concise briefing in 2 minutes instead of 30.\n\n[Research a Topic](command:hve-psa.step.researcher)",
+            "media": {
+              "markdown": "media/step-2-researcher.md"
+            },
+            "completionEvents": [
+              "onCommand:hve-psa.step.researcher"
+            ]
+          },
+          {
+            "id": "hve-psa.archDiagram",
+            "title": "Turn Your Whiteboard into a Diagram",
+            "description": "Describe a partner's architecture in plain English and get a professional Mermaid diagram you can share in docs or presentations.\n\n[Create a Diagram](command:hve-psa.step.archDiagram)",
+            "media": {
+              "markdown": "media/step-3-arch-diagram.md"
+            },
+            "completionEvents": [
+              "onCommand:hve-psa.step.archDiagram"
+            ]
+          },
+          {
+            "id": "hve-psa.adr",
+            "title": "Document Architecture Decisions",
+            "description": "Turn an architecture decision into a formal Architecture Decision Record (ADR) without writing one from scratch. Capture the context, options considered, and rationale.\n\n[Create an ADR](command:hve-psa.step.adr)",
+            "media": {
+              "markdown": "media/step-4-adr.md"
+            },
+            "completionEvents": [
+              "onCommand:hve-psa.step.adr"
+            ]
+          },
+          {
+            "id": "hve-psa.dashboard",
+            "title": "Build a Partner Demo Dashboard",
+            "description": "Generate a runnable Streamlit demo dashboard from a plain English description. Show partners a working prototype in minutes.\n\n[Build a Dashboard](command:hve-psa.step.dashboard)",
+            "media": {
+              "markdown": "media/step-5-dashboard.md"
+            },
+            "completionEvents": [
+              "onCommand:hve-psa.step.dashboard"
+            ]
+          },
+          {
+            "id": "hve-psa.iac",
+            "title": "Scaffold Azure Resources as Code",
+            "description": "Describe the Azure resources your partner needs and get deployable Bicep or Terraform code. The IaC Generator handles resource dependencies, naming, and best practices.\n\n[Generate IaC](command:hve-psa.step.iac)",
+            "media": {
+              "markdown": "media/step-6-iac.md"
+            },
+            "completionEvents": [
+              "onCommand:hve-psa.step.iac"
+            ]
+          },
+          {
+            "id": "hve-psa.security",
+            "title": "Review Code for Security",
+            "description": "Run a security-focused review of partner code before production. Catches OWASP Top 10 risks, secrets in code, and AI-specific vulnerabilities like prompt injection.\n\n[Run Security Review](command:hve-psa.step.security)",
+            "media": {
+              "markdown": "media/step-7-security.md"
+            },
+            "completionEvents": [
+              "onCommand:hve-psa.step.security"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
