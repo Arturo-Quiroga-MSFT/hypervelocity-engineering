@@ -49,6 +49,7 @@ This extension replaces that scattered workflow with a single guided walkthrough
 ## How It Works
 
 ```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': {'lineColor': '#ffffff', 'edgeLabelBackground': '#1e1e1e'}}}%%
 flowchart TD
     subgraph VSCode["VS Code Getting Started Tab"]
         subgraph Walkthrough["PSA Onboarding Walkthrough"]
@@ -65,6 +66,7 @@ flowchart TD
     style VSCode fill:#1e1e1e,stroke:#007acc,color:#fff
     style Walkthrough fill:#252526,stroke:#007acc,color:#fff
     style Chat fill:#0e639c,stroke:#007acc,color:#fff
+    linkStyle default stroke:#ffcc00,stroke-width:2px
 ```
 
 Each "Run" button opens Copilot Chat with the right agent and a starter prompt. Steps auto-complete when the command executes.
@@ -76,6 +78,7 @@ Each "Run" button opens Copilot Chat with the right agent and a starter prompt. 
 The walkthrough follows three phases that mirror a typical partner engagement lifecycle:
 
 ```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': {'lineColor': '#ffffff', 'edgeLabelBackground': '#1e1e1e'}}}%%
 flowchart LR
     subgraph P1["Phase 1: Configure · Learn · Visualize"]
         S1["1 MEMORY\n@memory\n~30s"]
@@ -114,6 +117,7 @@ flowchart LR
     style O5 fill:none,stroke:none,color:#888
     style O6 fill:none,stroke:none,color:#888
     style O7 fill:none,stroke:none,color:#888
+    linkStyle default stroke:#ffcc00,stroke-width:2px
 ```
 
 ### Phase 1: Configure, Learn, Visualize
@@ -145,6 +149,7 @@ flowchart LR
 The extension's most powerful feature is automatic context threading. When you set your partner engagement context in Step 1, every subsequent step uses it:
 
 ```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': {'lineColor': '#ffffff', 'edgeLabelBackground': '#1e1e1e'}}}%%
 flowchart TD
     CTX["Set Partner Context\n\nContoso: customer support chatbot\nusing Azure OpenAI + AI Search\nfor RAG over insurance claims docs"]
 
@@ -156,6 +161,7 @@ flowchart TD
     CTX -->|"context = {context}"| S7["Step 7: Security\nRAG pipeline review"]
 
     style CTX fill:#0e639c,stroke:#007acc,color:#fff
+    linkStyle default stroke:#ffcc00,stroke-width:2px
 ```
 
 > [!NOTE]
@@ -208,6 +214,7 @@ npx @vscode/vsce package
 ## Architecture
 
 ```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': {'lineColor': '#ffffff'}}}%%
 flowchart LR
     subgraph ext["psa-walkthrough-extension/"]
         PJ["package.json\n\nWalkthrough contribution\npoints, commands, step\ndefinitions + media refs"]
@@ -230,6 +237,7 @@ flowchart LR
 ### Data Flow
 
 ```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': {'lineColor': '#ffffff', 'edgeLabelBackground': '#1e1e1e'}}}%%
 flowchart LR
     PJ["package.json\n\nDefines UI steps\nand commands"] --> EJ["extension.js\n\nSTEP_PROMPTS +\npartner context merge\n\nBuilds final prompt"]
     EJ --> CC["Copilot Chat\n\n@agent + contextual\nprompt\n\nReceives and executes"]
@@ -237,6 +245,7 @@ flowchart LR
     style PJ fill:#264f78,stroke:#007acc,color:#fff
     style EJ fill:#4b3267,stroke:#c586c0,color:#fff
     style CC fill:#0e639c,stroke:#007acc,color:#fff
+    linkStyle default stroke:#ffcc00,stroke-width:2px
 ```
 
 ---
@@ -273,6 +282,7 @@ Replace `"markdown"` with `"image"` in any step's media property:
 ## Upstream Contribution Path
 
 ```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': {'lineColor': '#ffffff', 'edgeLabelBackground': '#1e1e1e'}}}%%
 flowchart LR
     Current["Standalone VSIX\nextension\n(this repo)"] -->|"Propose merge"| Target["HVE Core native\nwalkthrough\n(package.json)"]
 
@@ -283,6 +293,7 @@ flowchart LR
     style Target fill:#0e639c,stroke:#007acc,color:#fff
     style Steps fill:none,stroke:none,color:#888
     style Benefit fill:none,stroke:none,color:#888
+    linkStyle default stroke:#ffcc00,stroke-width:2px
 ```
 
 ---
