@@ -30,6 +30,7 @@ TEST_INPUTS = [
 ]
 
 CUSTOM_HEADERS = {
+    "x-tenant-id": "tenant-alpha",
     "x-user-id": "test-user-alpha",
     "x-cost-center": "engineering",
     "x-environment": "testbed",
@@ -41,6 +42,7 @@ def _make_client(gateway_url: str, api_key: str) -> OpenAI:
     return OpenAI(
         base_url=f"{gateway_url.rstrip('/')}/openai/v1/",
         api_key=api_key,
+        default_headers={"api-key": api_key},
     )
 
 

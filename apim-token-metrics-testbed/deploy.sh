@@ -1,6 +1,8 @@
 #!/bin/bash
 # ============================================================================
-# Deploy APIM Token Metrics Test Bed
+# Deploy APIM Token Metrics + Audit Logging Test Bed
+# Approach 1: llm-emit-token-metric → App Insights (billing)
+# Approach 2: log-to-eventhub → Event Hub (audit)
 # ============================================================================
 set -euo pipefail
 
@@ -9,7 +11,7 @@ RESOURCE_GROUP="${RESOURCE_GROUP:-rg-apim-token-metrics-testbed}"
 LOCATION="${LOCATION:-eastus2}"
 DEPLOYMENT_NAME="apim-token-metrics-$(date +%Y%m%d%H%M%S)"
 
-echo "=== APIM Token Metrics Test Bed - Deployment ==="
+echo "=== APIM Token Metrics + Audit Logging Test Bed — Deployment ==="
 echo "Resource Group: $RESOURCE_GROUP"
 echo "Location:       $LOCATION"
 echo ""
@@ -43,11 +45,14 @@ echo "Outputs saved to deployment-outputs.json"
 APIM_GATEWAY_URL=$(jq -r '.apimGatewayUrl.value' deployment-outputs.json)
 APIM_NAME=$(jq -r '.apimName.value' deployment-outputs.json)
 APP_INSIGHTS_NAME=$(jq -r '.appInsightsName.value' deployment-outputs.json)
+EVENTHUB_NS=$(jq -r '.eventHubNamespaceName.value' deployment-outputs.json)
 
 echo ""
 echo "APIM Gateway URL: $APIM_GATEWAY_URL"
 echo "APIM Name:        $APIM_NAME"
 echo "App Insights:     $APP_INSIGHTS_NAME"
+echo "Event Hub NS:     $EVENTHUB_NS"
+echo "Event Hub:        audit-logs"
 
 # Fetch subscription keys
 echo ""

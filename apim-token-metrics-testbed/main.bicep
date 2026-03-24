@@ -1,6 +1,7 @@
 // ============================================================================
-// APIM Token Metrics Emitting Test Bed
-// Tests the llm-emit-token-metric policy for billing/chargeback in streaming mode
+// APIM Token Metrics + Audit Logging Test Bed
+// Approach 1: llm-emit-token-metric → App Insights custom metrics (billing)
+// Approach 2: log-to-eventhub → Event Hub (audit/evaluation logging)
 // Based on: Azure-Samples/ai-gateway labs/token-metrics-emitting
 // ============================================================================
 
@@ -70,7 +71,7 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09
 }
 
 // ============================================================================
-// Application Insights - WithDimensions for custom metrics
+// Application Insights - WithDimensions for custom metrics (Approach 1)
 // ============================================================================
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: 'appi-${resourceSuffix}'
@@ -81,6 +82,42 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
     WorkspaceResourceId: logAnalyticsWorkspace.id
     #disable-next-line BCP037
     CustomMetricsOptedInType: 'WithDimensions'  // CRITICAL: enables dimensions on custom metrics
+  }
+}
+
+// ============================================================================
+// Event Hub Namespace + Hub (Approach 2: audit logging)
+// ============================================================================
+resource eventHubNamespace 'Microsoft.EventHub/namespaces@2024-01-01' = {
+  name: 'evhns-${resourceSuffix}'
+  location: location
+  sku: {
+    name: 'Standard'
+    tier: 'Standard'
+    capacity: 1
+  }
+}
+
+resource eventHub 'Microsoft.EventHub/namespaces/eventhubs@2024-01-01' = {
+  parent: eventHubNamespace
+  name: 'audit-logs'
+  properties: {
+    messageRetentionInDays: 3
+    partitionCount: 2
+  }
+}
+
+// RBAC: APIM -> Azure Event Hubs Data Sender (managed identity, no SAS needed)
+resource apimToEventHubRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(apim.id, eventHubNamespace.id, '2b629674-e913-4c01-ae53-ef4638d8f975')
+  scope: eventHubNamespace
+  properties: {
+    principalId: apim.identity.principalId
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      '2b629674-e913-4c01-ae53-ef4638d8f975'  // Azure Event Hubs Data Sender
+    )
   }
 }
 
@@ -103,7 +140,7 @@ resource apim 'Microsoft.ApiManagement/service@2024-05-01' = {
   }
 }
 
-// App Insights logger for APIM
+// App Insights logger for APIM (Approach 1)
 resource apimLogger 'Microsoft.ApiManagement/service/loggers@2024-05-01' = {
   parent: apim
   name: 'appinsights-logger'
@@ -113,6 +150,33 @@ resource apimLogger 'Microsoft.ApiManagement/service/loggers@2024-05-01' = {
       instrumentationKey: appInsights.properties.InstrumentationKey
     }
     resourceId: appInsights.id
+  }
+}
+
+// Diagnostic setting: Send APIM Gateway Logs to Log Analytics
+resource apimDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  scope: apim
+  name: 'apim-to-law'
+  properties: {
+    workspaceId: logAnalyticsWorkspace.id
+    logs: [
+      {
+        category: 'GatewayLogs'
+        enabled: true
+      }
+    ]
+  }
+}
+
+// Named value: Event Hub REST endpoint for send-request policy (Approach 2)
+// Uses REST API instead of log-to-eventhub because MCAPS policy disables SAS/local auth
+resource eventHubEndpointNamedValue 'Microsoft.ApiManagement/service/namedValues@2024-05-01' = {
+  parent: apim
+  name: 'eventhub-endpoint'
+  properties: {
+    displayName: 'eventhub-endpoint'
+    value: 'https://${eventHubNamespace.name}.servicebus.windows.net/${eventHub.name}/messages'
+    secret: false
   }
 }
 
@@ -266,6 +330,8 @@ output apimResourceId string = apim.id
 output appInsightsName string = appInsights.name
 output appInsightsId string = appInsights.id
 output logAnalyticsWorkspaceId string = logAnalyticsWorkspace.id
+output eventHubNamespaceName string = eventHubNamespace.name
+output eventHubName string = eventHub.name
 output aiServicesEndpoints array = [
   for (config, i) in aiServicesConfig: {
     name: config.name

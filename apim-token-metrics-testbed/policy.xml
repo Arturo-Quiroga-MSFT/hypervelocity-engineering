@@ -1,16 +1,22 @@
 <!--
-  APIM Policy: llm-emit-token-metric for billing/chargeback
+  APIM Policy: Combined Approach 1 + Approach 2
   
-  This policy emits token usage metrics to Application Insights custom metrics.
-  Works with STREAMING responses (tokens are estimated during streaming).
+  Approach 1 — llm-emit-token-metric:
+    Emits Token Counts as App Insights custom metrics for billing/chargeback.
+    Works with STREAMING (tokens estimated). Up to 5 custom dimensions.
   
-  Dimensions available by default (no configuration needed):
-    - API ID, Operation ID, Product ID, User ID, Subscription ID,
-      Location, Gateway ID, Backend ID
+  Approach 2 — send-request to Event Hub REST API (managed identity):
+    Logs full request/response bodies to Event Hub for audit/evaluation.
+    Uses send-request + authentication-managed-identity instead of log-to-eventhub,
+    because MCAPS policy disables SAS/local auth on Event Hub namespaces.
+    Inbound captures prompts. Outbound captures responses (non-streaming only).
+    Streaming responses: outbound body is an SSE stream consumed only once,
+    so response body logging is skipped for streaming calls.
   
-  Up to 5 CUSTOM dimensions can be added for billing/chargeback.
-  
-  Docs: https://learn.microsoft.com/azure/api-management/llm-emit-token-metric-policy
+  Docs:
+    - https://learn.microsoft.com/azure/api-management/llm-emit-token-metric-policy
+    - https://learn.microsoft.com/azure/api-management/send-request-policy
+    - https://learn.microsoft.com/azure/event-hubs/event-hubs-rest-api
 -->
 <policies>
     <inbound>
@@ -20,26 +26,93 @@
         <set-backend-service backend-id="ai-backend-foundry1" />
         <authentication-managed-identity resource="https://cognitiveservices.azure.com" />
         
-        <!-- Token metrics emission - the core policy under test -->
+        <!-- ============================================================ -->
+        <!-- APPROACH 1: Token metrics for billing/chargeback             -->
+        <!-- ============================================================ -->
         <llm-emit-token-metric>
             <!-- Custom dimension: Client IP for geo-based billing -->
             <dimension name="Client IP" value="@(context.Request.IpAddress)" />
             
-            <!-- Custom dimension: User ID from custom header (for per-user billing) -->
+            <!-- Custom dimension: Tenant ID from header (multi-tenant billing) -->
+            <dimension name="Tenant ID" value="@(context.Request.Headers.GetValueOrDefault("x-tenant-id", "unknown"))" />
+            
+            <!-- Custom dimension: User ID from custom header (per-user billing) -->
             <dimension name="User ID" value="@(context.Request.Headers.GetValueOrDefault("x-user-id", "unknown"))" />
             
-            <!-- Custom dimension: Cost Center from header (for department chargeback) -->
+            <!-- Custom dimension: Cost Center from header (department chargeback) -->
             <dimension name="Cost Center" value="@(context.Request.Headers.GetValueOrDefault("x-cost-center", "default"))" />
             
             <!-- Custom dimension: Environment tag -->
             <dimension name="Environment" value="@(context.Request.Headers.GetValueOrDefault("x-environment", "test"))" />
         </llm-emit-token-metric>
+
+        <!-- ============================================================ -->
+        <!-- APPROACH 2: Audit logging — inbound (request/prompt)         -->
+        <!-- Uses send-request + MI to Event Hub REST API (no SAS needed) -->
+        <!-- ============================================================ -->
+        <set-variable name="inbound-audit-payload" value="@{
+            var body = context.Request.Body?.As<string>(preserveContent: true);
+            return new JObject(
+                new JProperty("EventTime", DateTime.UtcNow.ToString("o")),
+                new JProperty("Direction", "request"),
+                new JProperty("RequestId", context.RequestId),
+                new JProperty("TenantId", context.Request.Headers.GetValueOrDefault("x-tenant-id", "unknown")),
+                new JProperty("UserId", context.Request.Headers.GetValueOrDefault("x-user-id", "unknown")),
+                new JProperty("CostCenter", context.Request.Headers.GetValueOrDefault("x-cost-center", "default")),
+                new JProperty("SubscriptionId", context.Subscription.Id),
+                new JProperty("ApiId", context.Api.Id),
+                new JProperty("OperationName", context.Operation.Name),
+                new JProperty("ClientIP", context.Request.IpAddress),
+                new JProperty("RequestBody", body)
+            ).ToString();
+        }" />
+        <send-request mode="new" response-variable-name="eh-inbound-response" timeout="5" ignore-error="true">
+            <set-url>{{eventhub-endpoint}}?api-version=2014-01</set-url>
+            <set-method>POST</set-method>
+            <set-header name="Content-Type" exists-action="override">
+                <value>application/atom+xml;type=entry;charset=utf-8</value>
+            </set-header>
+            <set-header name="BrokerProperties" exists-action="override">
+                <value>@(new JObject(new JProperty("PartitionKey", context.Request.Headers.GetValueOrDefault("x-tenant-id", "default"))).ToString(Newtonsoft.Json.Formatting.None))</value>
+            </set-header>
+            <set-body>@((string)context.Variables["inbound-audit-payload"])</set-body>
+            <authentication-managed-identity resource="https://eventhubs.azure.net" />
+        </send-request>
     </inbound>
     <backend>
         <base />
     </backend>
     <outbound>
         <base />
+
+        <!-- ============================================================ -->
+        <!-- APPROACH 2: Audit logging — outbound (response body)         -->
+        <!-- NOTE: Only captures non-streaming responses. For streaming,  -->
+        <!-- the SSE body is consumed by the client and not available here.-->
+        <!-- ============================================================ -->
+        <set-variable name="outbound-audit-payload" value="@{
+            var body = context.Response.Body?.As<string>(preserveContent: true);
+            return new JObject(
+                new JProperty("EventTime", DateTime.UtcNow.ToString("o")),
+                new JProperty("Direction", "response"),
+                new JProperty("RequestId", context.RequestId),
+                new JProperty("TenantId", context.Request.Headers.GetValueOrDefault("x-tenant-id", "unknown")),
+                new JProperty("StatusCode", context.Response.StatusCode),
+                new JProperty("ResponseBody", body)
+            ).ToString();
+        }" />
+        <send-request mode="new" response-variable-name="eh-outbound-response" timeout="5" ignore-error="true">
+            <set-url>{{eventhub-endpoint}}?api-version=2014-01</set-url>
+            <set-method>POST</set-method>
+            <set-header name="Content-Type" exists-action="override">
+                <value>application/atom+xml;type=entry;charset=utf-8</value>
+            </set-header>
+            <set-header name="BrokerProperties" exists-action="override">
+                <value>@(new JObject(new JProperty("PartitionKey", context.Request.Headers.GetValueOrDefault("x-tenant-id", "default"))).ToString(Newtonsoft.Json.Formatting.None))</value>
+            </set-header>
+            <set-body>@((string)context.Variables["outbound-audit-payload"])</set-body>
+            <authentication-managed-identity resource="https://eventhubs.azure.net" />
+        </send-request>
     </outbound>
     <on-error>
         <base />

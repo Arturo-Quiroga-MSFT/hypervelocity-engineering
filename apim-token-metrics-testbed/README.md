@@ -1,8 +1,13 @@
-# APIM Token Metrics Test Bed
+# APIM Token Metrics + Audit Logging Test Bed
 
-**Purpose**: Test the `llm-emit-token-metric` APIM policy for cost-effective token-level billing and chargeback in streaming mode — without relying on expensive Log Analytics ingestion.
+**Purpose**: Test two complementary APIM AI Gateway approaches for cost-effective billing and audit logging in streaming mode — without relying on expensive Log Analytics ingestion.
 
-**Context**: Partner scenario where APIM serves as an AI model gateway for multiple tenants. Streaming mode prevents traditional request/response logging. This policy emits token counts as Application Insights **custom metrics**, which are significantly cheaper than log ingestion and work with streaming.
+| Approach | Policy | Destination | Use Case |
+|---|---|---|---|
+| **1. Token Billing** | `llm-emit-token-metric` | App Insights custom metrics | Per-tenant token counts for chargeback |
+| **2. Audit Logging** | `log-to-eventhub` | Azure Event Hub | Full request/response bodies for evaluation |
+
+**Context**: Partner scenario where APIM serves as an AI model gateway for multiple tenants. Streaming mode prevents traditional request/response logging. Approach 1 emits token counts as Application Insights **custom metrics** (cheap). Approach 2 sends full request bodies to Event Hub for audit (also cheap).
 
 **API**: Uses the **Responses API** (`/openai/v1/responses`) — the newer API surface that replaces Chat Completions — with **GPT-5.4 mini** (`reasoning_effort=low`).
 
@@ -11,23 +16,29 @@
 ## Architecture
 
 ```
-┌──────────────┐      ┌──────────────────────────────--───┐     ┌──────────────────┐
+                                    ┌─────────────────────────┐
+                                    │   Application Insights   │
+                                    │   customMetrics table    │
+                               ┌───▶│ (Approach 1: billing)    │
+                               │    └─────────────────────────┘
+                               │
+┌──────────────┐      ┌────────┴──────────────────────────┐     ┌──────────────────┐
 │  Test Client │────▶ │  Azure API Management (APIM)      │────▶│  AI Foundry      │
 │  (Python SDK)│      │  POST /openai/v1/responses        │     │  GPT-5.4 mini    │
-└──────────────┘      │  ┌─────────────────────────────┐  │     └──────────────────┘
-                      │  │ llm-emit-token-metric policy│  │
-                      │  │ • Total Tokens              │  │
-                      │  │ • Input Tokens              │  │
-                      │  │ • Output Tokens             │  │
-                      │  │ + Custom Dimensions:        │  │
-                      │  │   - Client IP               │  │
-                      │  │   - User ID                 │  │
-                      │  │   - Cost Center             │  │
-                      │  │   - Environment             │  │
-                      │  └────────────┬────────────────┘  │
-                      └───────────────┼───────────────────┘
-                                      │
-                                      ▼
+└──────────────┘      │                                   │     └──────────────────┘
+                      │  Policies:                        │
+                      │  • llm-emit-token-metric (billing)│
+                      │    + 5 custom dimensions          │
+                      │  • log-to-eventhub (audit)        │
+                      │    inbound: request body           │
+                      │    outbound: response body         │
+                      └────────┬──────────────────────────┘
+                               │
+                               │    ┌─────────────────────────┐
+                               └───▶│   Azure Event Hub        │
+                                    │   audit-logs             │
+                                    │ (Approach 2: audit)      │
+                                    └─────────────────────────┘
                       ┌───────────────────────────────────┐
                       │   Application Insights            │
                       │   customMetrics table             │
@@ -49,15 +60,19 @@
 |---|---|
 | **API** | **Responses API** (`POST /openai/v1/responses`) — not Chat Completions |
 | **Model** | `gpt-5.4-mini` with `reasoning_effort=low` (GPT-5.4 family reasoning model) |
-| **Policy** | `llm-emit-token-metric` (inbound) — supports Responses API (preview) |
-| **Streaming support** | Yes — tokens are **estimated** during streaming |
+| **Approach 1 policy** | `llm-emit-token-metric` (inbound) — supports Responses API (preview) |
+| **Approach 2 policy** | `log-to-eventhub` (inbound + outbound) — full request/response audit |
+| **Streaming support** | Approach 1: Yes (tokens estimated). Approach 2: Inbound only (outbound SSE not capturable) |
 | **APIM tiers** | All tiers (Consumption, Developer, Basic, Standard, Premium, Basicv2, Standardv2) |
-| **Metrics emitted** | Total Tokens, Input Tokens, Output Tokens |
+| **Metrics emitted** | Total Tokens, Input Tokens, Output Tokens → App Insights custom metrics |
+| **Audit events** | Full request body (inbound) + response body (outbound, non-streaming) → Event Hub |
 | **Default dimensions** | API ID, Operation ID, Product ID, User ID, Subscription ID, Location, Gateway ID, Backend ID |
-| **Custom dimensions** | Up to 5 per policy (we use: Client IP, User ID, Cost Center, Environment) |
-| **Metrics destination** | App Insights `customMetrics` table |
-| **Cost model** | Custom metrics ingestion ≈ **$0.00 for first 150M data points/month**, then ~$0.001/1K — orders of magnitude cheaper than Log Analytics log ingestion |
-| **Latency** | Metrics appear in App Insights within 3-5 minutes |
+| **Custom dimensions** | Up to 5 per policy (we use: Tenant ID, Client IP, User ID, Cost Center, Environment) |
+| **Billing destination** | App Insights `customMetrics` table |
+| **Audit destination** | Event Hub `audit-logs` (Standard tier, 3-day retention) |
+| **Billing cost** | Custom metrics ≈ **$0.00 for first 150M data points/month**, then ~$0.001/1K |
+| **Audit cost** | Event Hub Standard ~$11/month base + ~$0.028/million events |
+| **Latency** | Metrics: 3-5 min to App Insights. Events: near real-time to Event Hub |
 
 ## Prerequisites
 
@@ -79,10 +94,12 @@ cd apim-token-metrics-testbed
 ```
 
 This creates:
+
 - Resource group `rg-apim-token-metrics-testbed`
 - Log Analytics Workspace
-- Application Insights (with `customMetricsOptedInType: WithDimensions`)
-- APIM instance (Basicv2) with the `llm-emit-token-metric` policy and Responses API operations
+- Application Insights (with `customMetricsOptedInType: WithDimensions`) — Approach 1 destination
+- Event Hub Namespace + `audit-logs` hub (Standard tier) — Approach 2 destination
+- APIM instance (Basicv2) with combined policy (both `llm-emit-token-metric` + `log-to-eventhub`) and Responses API operations
 - AI Services account with `gpt-5.4-mini` deployment (reasoning model)
 - 3 APIM subscriptions (tenant-a, tenant-b, tenant-c) for multi-tenant testing
 
@@ -152,27 +169,40 @@ Available validation queries:
 
 | File | Purpose |
 |---|---|
-| `main.bicep` | Infrastructure-as-code: APIM with Responses API operations, App Insights, AI Services (gpt-5.4-mini), RBAC, subscriptions |
+| `main.bicep` | IaC: APIM, App Insights, Event Hub, AI Services (gpt-5.4-mini), RBAC, subscriptions |
 | `main.parameters.json` | Deployment parameters (SKU, region, model, tenants) |
-| `policy.xml` | APIM policy with `llm-emit-token-metric` and 4 custom billing dimensions |
+| `policy.xml` | Combined policy: `llm-emit-token-metric` (billing) + `log-to-eventhub` (audit) |
 | `deploy.sh` | One-click deploy script (creates RG, deploys Bicep, fetches keys) |
-| `test_token_metrics.py` | Responses API test client: non-streaming, streaming, SDK, multi-tenant — uses `reasoning_effort=low` |
+| `test_token_metrics.py` | Responses API test client: non-streaming, streaming, SDK, multi-tenant |
 | `validate_metrics.py` | KQL queries to verify metrics in App Insights |
 | `cleanup.sh` | Delete all test resources |
 | `requirements.txt` | Python dependencies |
 
 ## What to Look For
 
+### Approach 1 — Token Billing (App Insights)
+
 1. **Metrics appear for streaming calls** — The whole point. Verify `customMetrics` table has entries from streaming Responses API requests.
-2. **Token counts are reasonable** — Streaming uses estimation; compare with non-streaming actuals. Reasoning tokens (`output_tokens_details.reasoning_tokens`) add overhead vs non-reasoning models.
-3. **Custom dimensions are populated** — Client IP, User ID, Cost Center, Environment should all appear.
-4. **Per-subscription segregation** — Different APIM subscriptions (tenant-a/b/c) should appear as distinct `Subscription ID` dimension values.
-5. **Responses API compatibility** — Confirm `llm-emit-token-metric` works correctly with the `/v1/responses` endpoint (currently preview support).
-6. **Cost at scale** — Custom metrics pricing is ~150M free data points/month, then $0.001/1K. Compare this against Log Analytics ingestion at $2.76/GB.
+2. **Token counts are reasonable** — Streaming uses estimation; compare with non-streaming actuals.
+3. **Custom dimensions populated** — Tenant ID, Client IP, User ID, Cost Center, Environment should all appear.
+4. **Per-subscription segregation** — Different APIM subscriptions (tenant-a/b/c) appear as distinct `Subscription ID` dimension values.
+
+### Approach 2 — Audit Logging (Event Hub)
+
+5. **Inbound events captured** — Full request bodies (prompts) appear in Event Hub `audit-logs`.
+6. **Outbound events for non-streaming** — Response bodies captured for non-streaming calls.
+7. **Streaming caveat** — Outbound events for streaming calls have empty/partial response bodies (SSE single-consumer limitation). This is expected.
+8. **Tenant headers propagated** — `TenantId`, `UserId`, `CostCenter` fields in Event Hub events match the request headers.
+
+### Both Approaches
+
+9. **Responses API compatibility** — Confirm both policies work correctly with `/v1/responses` (preview support).
+10. **Cost at scale** — Custom metrics: ~150M free data points/month. Event Hub: ~$11/month + $0.028/million events. Compare vs Log Analytics at $2.76/GB.
 
 ## References
 
 - [llm-emit-token-metric policy reference](https://learn.microsoft.com/azure/api-management/llm-emit-token-metric-policy)
+- [log-to-eventhub policy reference](https://learn.microsoft.com/azure/api-management/api-management-howto-log-event-hubs)
 - [Azure OpenAI Responses API](https://learn.microsoft.com/azure/foundry/openai/how-to/responses)
 - [Monitor and log LLM token usage](https://learn.microsoft.com/azure/api-management/api-management-howto-llm-logs)
 - [GenAI Gateway capabilities in APIM](https://learn.microsoft.com/azure/api-management/genai-gateway-capabilities)
