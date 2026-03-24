@@ -1,0 +1,53 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "eastus2"
+    },
+    "apimSku": {
+      "value": "Basicv2"
+    },
+    "apimPublisherName": {
+      "value": "Token Metrics TestBed"
+    },
+    "apimPublisherEmail": {
+      "value": "YOUR_EMAIL@contoso.com"
+    },
+    "aiServicesConfig": {
+      "value": [
+        {
+          "name": "foundry1",
+          "location": "eastus2"
+        }
+      ]
+    },
+    "modelsConfig": {
+      "value": [
+        {
+          "name": "gpt-5.4-mini",
+          "publisher": "OpenAI",
+          "version": "2026-03-05",
+          "sku": "GlobalStandard",
+          "capacity": 20
+        }
+      ]
+    },
+    "apimSubscriptionsConfig": {
+      "value": [
+        {
+          "name": "tenant-a",
+          "displayName": "Tenant A"
+        },
+        {
+          "name": "tenant-b",
+          "displayName": "Tenant B"
+        },
+        {
+          "name": "tenant-c",
+          "displayName": "Tenant C"
+        }
+      ]
+    }
+  }
+}

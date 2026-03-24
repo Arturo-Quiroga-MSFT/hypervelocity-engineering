@@ -1,0 +1,47 @@
+<!--
+  APIM Policy: llm-emit-token-metric for billing/chargeback
+  
+  This policy emits token usage metrics to Application Insights custom metrics.
+  Works with STREAMING responses (tokens are estimated during streaming).
+  
+  Dimensions available by default (no configuration needed):
+    - API ID, Operation ID, Product ID, User ID, Subscription ID,
+      Location, Gateway ID, Backend ID
+  
+  Up to 5 CUSTOM dimensions can be added for billing/chargeback.
+  
+  Docs: https://learn.microsoft.com/azure/api-management/llm-emit-token-metric-policy
+-->
+<policies>
+    <inbound>
+        <base />
+        
+        <!-- Route to backend - use managed identity for auth -->
+        <set-backend-service backend-id="ai-backend-foundry1" />
+        <authentication-managed-identity resource="https://cognitiveservices.azure.com" />
+        
+        <!-- Token metrics emission - the core policy under test -->
+        <llm-emit-token-metric>
+            <!-- Custom dimension: Client IP for geo-based billing -->
+            <dimension name="Client IP" value="@(context.Request.IpAddress)" />
+            
+            <!-- Custom dimension: User ID from custom header (for per-user billing) -->
+            <dimension name="User ID" value="@(context.Request.Headers.GetValueOrDefault("x-user-id", "unknown"))" />
+            
+            <!-- Custom dimension: Cost Center from header (for department chargeback) -->
+            <dimension name="Cost Center" value="@(context.Request.Headers.GetValueOrDefault("x-cost-center", "default"))" />
+            
+            <!-- Custom dimension: Environment tag -->
+            <dimension name="Environment" value="@(context.Request.Headers.GetValueOrDefault("x-environment", "test"))" />
+        </llm-emit-token-metric>
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
