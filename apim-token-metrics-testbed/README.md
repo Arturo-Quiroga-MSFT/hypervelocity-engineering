@@ -32,38 +32,26 @@ surface that replaces Chat Completions — with **GPT-5.4 mini**
 
 ## Architecture
 
-```text
-                                    ┌─────────────────────────┐
-                                    │   Application Insights   │
-                                    │   customMetrics table    │
-                               ┌───▶│ (Approach 1: billing)    │
-                               │    └─────────────────────────┘
-                               │
-┌──────────────┐      ┌────────┴──────────────────────────┐     ┌──────────────────┐
-│  Test Client │────▶ │  Azure API Management (APIM)      │────▶│  AI Foundry      │
-│  (Python SDK)│      │  POST /openai/v1/responses        │     │  GPT-5.4 mini    │
-└──────────────┘      │                                   │     └──────────────────┘
-                      │  Policies:                        │
-                      │  • emit-metric (token billing)    │
-                      │    outbound — parses usage JSON    │
-                      │    + 5 custom dimensions           │
-                      │  • send-request (audit)            │
-                      │    inbound: request body            │
-                      │    outbound: response body          │
-                      │    (MI auth to Event Hub REST API) │
-                      └────────┬──────────────────────────┘
-                               │
-                               │    ┌─────────────────────────┐
-                               └───▶│   Azure Event Hub        │
-                                    │   audit-logs             │
-                                    │ (Approach 2: audit)      │
-                                    └─────────────────────────┘
-                      ┌───────────────────────────────────┐
-                      │   KQL Queries (validate_metrics.py)│
-                      │   • Per-tenant token usage         │
-                      │   • Prompt vs completion breakdown │
-                      │   • Time series analysis           │
-                      └───────────────────────────────────┘
+```mermaid
+flowchart LR
+    TC["**Test Client**\nPython SDK"]
+
+    subgraph APIM_BOX ["Azure API Management — POST /openai/v1/responses"]
+        direction TB
+        EM["**emit-metric** *(outbound)*\nParses usage JSON\n5 custom dimensions"]
+        SR["**send-request** *(inbound + outbound)*\nMI auth to Event Hub REST API\nCaptures request + response bodies"]
+    end
+
+    AI["**AI Foundry**\ngpt-5.4-mini"]
+    AppInsights["**Application Insights**\ncustomMetrics table\n*(Approach 1 — billing)*"]
+    EventHub["**Azure Event Hub**\naudit-logs\n*(Approach 2 — audit)*"]
+    KQL["**validate_metrics.py**\nKQL validation queries\n• Per-tenant token usage\n• Prompt vs completion\n• Time series"]
+
+    TC -->|"API request"| APIM_BOX
+    APIM_BOX -->|"forward"| AI
+    EM -->|"custom metrics"| AppInsights
+    SR -->|"audit events"| EventHub
+    AppInsights -.->|"verify"| KQL
 ```
 
 ## Key technical details
