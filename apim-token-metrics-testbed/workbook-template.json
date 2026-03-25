@@ -1,0 +1,423 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "# LLM Token Billing Dashboard\n\nReal-time token consumption metrics from Azure API Management AI Gateway.\nMetrics flow: **APIM emit-metric** → **App Insights customMetrics** → **this workbook**.\n\n---"
+      },
+      "name": "header"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "time-range",
+            "version": "KqlParameterItem/1.0",
+            "name": "TimeRange",
+            "type": 4,
+            "isRequired": true,
+            "typeSettings": {
+              "selectableValues": [
+                { "durationMs": 300000 },
+                { "durationMs": 900000 },
+                { "durationMs": 1800000 },
+                { "durationMs": 3600000 },
+                { "durationMs": 14400000 },
+                { "durationMs": 43200000 },
+                { "durationMs": 86400000 },
+                { "durationMs": 172800000 },
+                { "durationMs": 604800000 }
+              ],
+              "allowCustom": true
+            },
+            "value": {
+              "durationMs": 3600000
+            },
+            "label": "Time Range"
+          },
+          {
+            "id": "subscription-filter",
+            "version": "KqlParameterItem/1.0",
+            "name": "SubscriptionFilter",
+            "type": 2,
+            "isRequired": false,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "customMetrics\n| where name == 'Total Tokens'\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| distinct tostring(d['Subscription ID'])",
+            "typeSettings": {
+              "additionalResourceOptions": ["value::all"],
+              "showDefault": false
+            },
+            "value": ["value::all"],
+            "label": "APIM Subscription"
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components"
+      },
+      "name": "parameters"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## Overview"
+      },
+      "name": "overview-heading"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let subFilter = dynamic([{SubscriptionFilter}]);\ncustomMetrics\n| where name == 'Total Tokens'\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| extend sub = tostring(d['Subscription ID'])\n| where array_length(subFilter) == 0 or '*' in (subFilter) or sub in (subFilter)\n| summarize TotalTokens=sum(value)\n| project strcat(format_decimal(TotalTokens, 0))",
+        "size": 4,
+        "title": "Total Tokens Consumed",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components",
+        "visualization": "tiles",
+        "tileSettings": {
+          "titleContent": {
+            "columnMatch": "Column1",
+            "formatter": 1
+          },
+          "showBorder": false
+        }
+      },
+      "customWidth": "25",
+      "name": "tile-total-tokens"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let subFilter = dynamic([{SubscriptionFilter}]);\ncustomMetrics\n| where name == 'Prompt Tokens'\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| extend sub = tostring(d['Subscription ID'])\n| where array_length(subFilter) == 0 or '*' in (subFilter) or sub in (subFilter)\n| summarize PromptTokens=sum(value)\n| project strcat(format_decimal(PromptTokens, 0))",
+        "size": 4,
+        "title": "Prompt Tokens (Input)",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components",
+        "visualization": "tiles",
+        "tileSettings": {
+          "titleContent": {
+            "columnMatch": "Column1",
+            "formatter": 1
+          },
+          "showBorder": false
+        }
+      },
+      "customWidth": "25",
+      "name": "tile-prompt-tokens"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let subFilter = dynamic([{SubscriptionFilter}]);\ncustomMetrics\n| where name == 'Completion Tokens'\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| extend sub = tostring(d['Subscription ID'])\n| where array_length(subFilter) == 0 or '*' in (subFilter) or sub in (subFilter)\n| summarize CompletionTokens=sum(value)\n| project strcat(format_decimal(CompletionTokens, 0))",
+        "size": 4,
+        "title": "Completion Tokens (Output)",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components",
+        "visualization": "tiles",
+        "tileSettings": {
+          "titleContent": {
+            "columnMatch": "Column1",
+            "formatter": 1
+          },
+          "showBorder": false
+        }
+      },
+      "customWidth": "25",
+      "name": "tile-completion-tokens"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let subFilter = dynamic([{SubscriptionFilter}]);\ncustomMetrics\n| where name == 'Total Tokens'\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| extend sub = tostring(d['Subscription ID'])\n| where array_length(subFilter) == 0 or '*' in (subFilter) or sub in (subFilter)\n| summarize APIcalls=count()\n| project strcat(format_decimal(APIcalls, 0))",
+        "size": 4,
+        "title": "API Calls",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components",
+        "visualization": "tiles",
+        "tileSettings": {
+          "titleContent": {
+            "columnMatch": "Column1",
+            "formatter": 1
+          },
+          "showBorder": false
+        }
+      },
+      "customWidth": "25",
+      "name": "tile-api-calls"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## Token Consumption Over Time"
+      },
+      "name": "timeseries-heading"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let subFilter = dynamic([{SubscriptionFilter}]);\ncustomMetrics\n| where name in ('Total Tokens', 'Prompt Tokens', 'Completion Tokens')\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| extend sub = tostring(d['Subscription ID'])\n| where array_length(subFilter) == 0 or '*' in (subFilter) or sub in (subFilter)\n| summarize Tokens=sum(value) by bin(timestamp, 5m), name\n| render timechart",
+        "size": 0,
+        "title": "All Token Types — 5-Minute Intervals",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components",
+        "visualization": "timechart",
+        "chartSettings": {
+          "seriesLabelSettings": [
+            { "seriesName": "Total Tokens", "color": "blue" },
+            { "seriesName": "Prompt Tokens", "color": "green" },
+            { "seriesName": "Completion Tokens", "color": "orange" }
+          ]
+        }
+      },
+      "name": "chart-tokens-over-time"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## Prompt vs Completion Breakdown"
+      },
+      "name": "breakdown-heading"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let subFilter = dynamic([{SubscriptionFilter}]);\ncustomMetrics\n| where name in ('Prompt Tokens', 'Completion Tokens')\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| extend sub = tostring(d['Subscription ID'])\n| where array_length(subFilter) == 0 or '*' in (subFilter) or sub in (subFilter)\n| summarize Tokens=sum(value) by name\n| render piechart",
+        "size": 0,
+        "title": "Input vs Output Token Distribution",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components",
+        "visualization": "piechart",
+        "chartSettings": {
+          "seriesLabelSettings": [
+            { "seriesName": "Prompt Tokens", "color": "green" },
+            { "seriesName": "Completion Tokens", "color": "orange" }
+          ]
+        }
+      },
+      "customWidth": "40",
+      "name": "chart-prompt-vs-completion"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let subFilter = dynamic([{SubscriptionFilter}]);\ncustomMetrics\n| where name in ('Total Tokens', 'Prompt Tokens', 'Completion Tokens')\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| extend sub = tostring(d['Subscription ID'])\n| where array_length(subFilter) == 0 or '*' in (subFilter) or sub in (subFilter)\n| extend subscriptionName = tostring(d['Subscription Name'])\n| summarize Tokens=sum(value), Calls=count() by name, sub, subscriptionName\n| project Subscription=coalesce(subscriptionName, sub), MetricName=name, Tokens, Calls\n| order by Subscription asc, MetricName asc",
+        "size": 0,
+        "title": "Token Breakdown by Subscription",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components",
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "Tokens",
+              "formatter": 3,
+              "formatOptions": {
+                "palette": "blue"
+              }
+            },
+            {
+              "columnMatch": "Calls",
+              "formatter": 3,
+              "formatOptions": {
+                "palette": "turquoise"
+              }
+            }
+          ]
+        }
+      },
+      "customWidth": "60",
+      "name": "table-tokens-by-subscription"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## Tenant Billing View"
+      },
+      "name": "billing-heading"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let subFilter = dynamic([{SubscriptionFilter}]);\nlet costPerToken = 0.00000015;\ncustomMetrics\n| where name == 'Total Tokens'\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| extend sub = tostring(d['Subscription ID'])\n| where array_length(subFilter) == 0 or '*' in (subFilter) or sub in (subFilter)\n| extend subscriptionName = tostring(d['Subscription Name'])\n| extend tenantId = tostring(d['Tenant ID'])\n| summarize TotalTokens=sum(value), Calls=count() by subscriptionName, tenantId\n| extend EstimatedCostUSD=round(TotalTokens * costPerToken, 6)\n| extend AvgTokensPerCall=round(TotalTokens / Calls, 0)\n| project Tenant=coalesce(subscriptionName, tenantId), TotalTokens, Calls, AvgTokensPerCall, EstimatedCostUSD\n| order by TotalTokens desc",
+        "size": 0,
+        "title": "Tenant Chargeback Summary (GPT-5.4-mini @ $0.15/1M tokens)",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components",
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "TotalTokens",
+              "formatter": 3,
+              "formatOptions": {
+                "palette": "blue"
+              }
+            },
+            {
+              "columnMatch": "EstimatedCostUSD",
+              "formatter": 0,
+              "numberFormat": {
+                "unit": 0,
+                "options": {
+                  "style": "currency",
+                  "currency": "USD",
+                  "minimumFractionDigits": 6
+                }
+              }
+            }
+          ]
+        }
+      },
+      "name": "table-tenant-billing"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let subFilter = dynamic([{SubscriptionFilter}]);\ncustomMetrics\n| where name == 'Total Tokens'\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| extend sub = tostring(d['Subscription ID'])\n| where array_length(subFilter) == 0 or '*' in (subFilter) or sub in (subFilter)\n| extend subscriptionName = tostring(d['Subscription Name'])\n| summarize TotalTokens=sum(value) by bin(timestamp, 5m), subscriptionName\n| render barchart",
+        "size": 0,
+        "title": "Token Consumption by Tenant Over Time",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components",
+        "visualization": "barchart",
+        "chartSettings": {
+          "ySettings": {
+            "numberFormatSettings": {
+              "unit": 0,
+              "options": {
+                "style": "decimal"
+              }
+            }
+          }
+        }
+      },
+      "name": "chart-tenant-over-time"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## Operational Details"
+      },
+      "name": "operations-heading"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let subFilter = dynamic([{SubscriptionFilter}]);\ncustomMetrics\n| where name == 'Total Tokens'\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| extend sub = tostring(d['Subscription ID'])\n| where array_length(subFilter) == 0 or '*' in (subFilter) or sub in (subFilter)\n| extend clientIP = tostring(d['Client IP'])\n| extend apiId = tostring(d['API ID'])\n| extend subscriptionName = tostring(d['Subscription Name'])\n| extend tenantId = tostring(d['Tenant ID'])\n| project Timestamp=timestamp, Tokens=value, Tenant=tenantId, Subscription=subscriptionName, API=apiId, ClientIP=clientIP\n| order by Timestamp desc\n| take 50",
+        "size": 0,
+        "title": "Recent API Calls — Raw Detail (last 50)",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components",
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "Tokens",
+              "formatter": 3,
+              "formatOptions": {
+                "palette": "blue"
+              }
+            },
+            {
+              "columnMatch": "Timestamp",
+              "formatter": 6
+            }
+          ]
+        }
+      },
+      "name": "table-raw-calls"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let subFilter = dynamic([{SubscriptionFilter}]);\ncustomMetrics\n| where name == 'Total Tokens'\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| extend sub = tostring(d['Subscription ID'])\n| where array_length(subFilter) == 0 or '*' in (subFilter) or sub in (subFilter)\n| summarize Calls=count(), AvgTokens=round(avg(value), 0), MaxTokens=max(value), MinTokens=min(value), P50=round(percentile(value, 50), 0), P95=round(percentile(value, 95), 0), P99=round(percentile(value, 99), 0)\n| project Calls, AvgTokens, MinTokens, P50, P95, P99, MaxTokens",
+        "size": 0,
+        "title": "Token Distribution Statistics",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components",
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": ".*",
+              "formatter": 0,
+              "numberFormat": {
+                "unit": 0,
+                "options": {
+                  "style": "decimal",
+                  "maximumFractionDigits": 0
+                }
+              }
+            }
+          ]
+        }
+      },
+      "name": "table-token-stats"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## Cost Projection"
+      },
+      "name": "cost-heading"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let subFilter = dynamic([{SubscriptionFilter}]);\nlet costPerToken = 0.00000015;\ncustomMetrics\n| where name == 'Total Tokens'\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| extend sub = tostring(d['Subscription ID'])\n| where array_length(subFilter) == 0 or '*' in (subFilter) or sub in (subFilter)\n| extend subscriptionName = tostring(d['Subscription Name'])\n| summarize Tokens=sum(value), Calls=count() by bin(timestamp, 1h), subscriptionName\n| extend CostUSD=round(Tokens * costPerToken, 4)\n| project timestamp, Tenant=subscriptionName, Tokens, Calls, CostUSD\n| order by timestamp desc, CostUSD desc",
+        "size": 0,
+        "title": "Hourly Cost Breakdown by Tenant",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components",
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "Tokens",
+              "formatter": 3,
+              "formatOptions": {
+                "palette": "blue"
+              }
+            },
+            {
+              "columnMatch": "CostUSD",
+              "formatter": 3,
+              "formatOptions": {
+                "palette": "redGreen"
+              }
+            },
+            {
+              "columnMatch": "timestamp",
+              "formatter": 6
+            }
+          ]
+        }
+      },
+      "name": "table-hourly-cost"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "---\n\n*Data source: `customMetrics` table in App Insights via APIM `emit-metric` policy*\\\n*Namespace: `LLM Token Metrics` | Metrics: Total Tokens, Prompt Tokens, Completion Tokens*\\\n*Cost estimate uses GPT-5.4-mini pricing ($0.15 / 1M input tokens). Actual costs vary by model and token type.*"
+      },
+      "name": "footer"
+    }
+  ],
+  "fallbackResourceIds": [],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
