@@ -73,7 +73,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "let subFilter = dynamic([{SubscriptionFilter}]);\ncustomMetrics\n| where name == 'Total Tokens'\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| extend sub = tostring(d['Subscription ID'])\n| where array_length(subFilter) == 0 or '*' in (subFilter) or sub in (subFilter)\n| summarize TotalTokens=sum(value)\n| project strcat(format_decimal(TotalTokens, 0))",
+        "query": "let subFilter = dynamic([{SubscriptionFilter}]);\ncustomMetrics\n| where name == 'Total Tokens'\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| extend sub = tostring(d['Subscription ID'])\n| where array_length(subFilter) == 0 or '*' in (subFilter) or sub in (subFilter)\n| summarize TotalTokens=sum(value)",
         "size": 4,
         "title": "Total Tokens Consumed",
         "queryType": 0,
@@ -81,8 +81,9 @@
         "visualization": "tiles",
         "tileSettings": {
           "titleContent": {
-            "columnMatch": "Column1",
-            "formatter": 1
+            "columnMatch": "TotalTokens",
+            "formatter": 12,
+            "formatOptions": { "palette": "blue" }
           },
           "showBorder": false
         }
@@ -94,7 +95,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "let subFilter = dynamic([{SubscriptionFilter}]);\ncustomMetrics\n| where name == 'Prompt Tokens'\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| extend sub = tostring(d['Subscription ID'])\n| where array_length(subFilter) == 0 or '*' in (subFilter) or sub in (subFilter)\n| summarize PromptTokens=sum(value)\n| project strcat(format_decimal(PromptTokens, 0))",
+        "query": "let subFilter = dynamic([{SubscriptionFilter}]);\ncustomMetrics\n| where name == 'Prompt Tokens'\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| extend sub = tostring(d['Subscription ID'])\n| where array_length(subFilter) == 0 or '*' in (subFilter) or sub in (subFilter)\n| summarize PromptTokens=sum(value)",
         "size": 4,
         "title": "Prompt Tokens (Input)",
         "queryType": 0,
@@ -102,8 +103,9 @@
         "visualization": "tiles",
         "tileSettings": {
           "titleContent": {
-            "columnMatch": "Column1",
-            "formatter": 1
+            "columnMatch": "PromptTokens",
+            "formatter": 12,
+            "formatOptions": { "palette": "green" }
           },
           "showBorder": false
         }
@@ -115,7 +117,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "let subFilter = dynamic([{SubscriptionFilter}]);\ncustomMetrics\n| where name == 'Completion Tokens'\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| extend sub = tostring(d['Subscription ID'])\n| where array_length(subFilter) == 0 or '*' in (subFilter) or sub in (subFilter)\n| summarize CompletionTokens=sum(value)\n| project strcat(format_decimal(CompletionTokens, 0))",
+        "query": "let subFilter = dynamic([{SubscriptionFilter}]);\ncustomMetrics\n| where name == 'Completion Tokens'\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| extend sub = tostring(d['Subscription ID'])\n| where array_length(subFilter) == 0 or '*' in (subFilter) or sub in (subFilter)\n| summarize CompletionTokens=sum(value)",
         "size": 4,
         "title": "Completion Tokens (Output)",
         "queryType": 0,
@@ -123,8 +125,9 @@
         "visualization": "tiles",
         "tileSettings": {
           "titleContent": {
-            "columnMatch": "Column1",
-            "formatter": 1
+            "columnMatch": "CompletionTokens",
+            "formatter": 12,
+            "formatOptions": { "palette": "orange" }
           },
           "showBorder": false
         }
@@ -136,7 +139,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "let subFilter = dynamic([{SubscriptionFilter}]);\ncustomMetrics\n| where name == 'Total Tokens'\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| extend sub = tostring(d['Subscription ID'])\n| where array_length(subFilter) == 0 or '*' in (subFilter) or sub in (subFilter)\n| summarize APIcalls=count()\n| project strcat(format_decimal(APIcalls, 0))",
+        "query": "let subFilter = dynamic([{SubscriptionFilter}]);\ncustomMetrics\n| where name == 'Total Tokens'\n| where timestamp {TimeRange}\n| extend d = parse_json(customDimensions)\n| extend sub = tostring(d['Subscription ID'])\n| where array_length(subFilter) == 0 or '*' in (subFilter) or sub in (subFilter)\n| summarize APIcalls=count()",
         "size": 4,
         "title": "API Calls",
         "queryType": 0,
@@ -144,8 +147,9 @@
         "visualization": "tiles",
         "tileSettings": {
           "titleContent": {
-            "columnMatch": "Column1",
-            "formatter": 1
+            "columnMatch": "APIcalls",
+            "formatter": 12,
+            "formatOptions": { "palette": "turquoise" }
           },
           "showBorder": false
         }
