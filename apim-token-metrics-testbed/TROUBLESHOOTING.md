@@ -395,3 +395,70 @@ in App Insights `customMetrics`:
 | Metric names | "Total Tokens", "Prompt Tokens", "Completion Tokens" |
 | Metric namespace | "LLM Token Metrics" |
 | Dimensions | Client IP, Tenant ID, Subscription Name, API ID, Subscription ID |
+
+## Root cause 4 — `format_decimal()` not available in App Insights KQL
+
+### Symptom
+
+Azure Monitor Workbook tiles show **"Unknown function: 'format_decimal'"** for
+every KPI tile displaying token counts or API call totals. The timechart and
+table sections render correctly; only the summary tile cells fail.
+
+### Root cause
+
+`format_decimal()` is an **Azure Data Explorer (ADX)** built-in function.
+It is **not available** in App Insights KQL (Kusto queries executed against a
+Log Analytics workspace). Workbooks that target an App Insights data source use
+the Log Analytics query engine, which does not include this function.
+
+Attempting to use it results in a silent render failure on each tile — no
+stacktrace, just "Unknown function" in the tile header.
+
+### Fix
+
+Remove all `format_decimal()` calls. Return the summarised numeric value
+directly using a named column instead:
+
+```kql
+// BEFORE (broken in App Insights)
+customMetrics
+| where name == 'Total Tokens'
+| where timestamp {TimeRange}
+| summarize total = sum(value)
+| project strcat(format_decimal(total, '0,0'), ' tokens')
+
+// AFTER (works in App Insights)
+customMetrics
+| where name == 'Total Tokens'
+| where timestamp {TimeRange}
+| summarize TotalTokens = sum(value)
+```
+
+In the workbook JSON, update `tileSettings.titleContent` to reference the
+new column name and use `formatter: 12` (color block number) instead of
+`formatter: 1` (text):
+
+```json
+"tileSettings": {
+  "titleContent": {
+    "columnMatch": "TotalTokens",
+    "formatter": 12,
+    "formatOptions": { "palette": "blue" }
+  }
+}
+```
+
+### Scope
+
+This affects any Azure Monitor Workbook query targeting an **App Insights**
+or **Log Analytics** data source. The same queries work fine in ADX clusters
+or Azure Data Explorer web UI.
+
+### Functions to avoid in App Insights KQL
+
+| Function | Only available in |
+|---|---|
+| `format_decimal()` | ADX |
+| `format_bytes()` | ADX |
+| `format_timespan()` | ADX (use `totimespan()` or string formatting instead) |
+| `series_decompose_forecast()` | ADX |

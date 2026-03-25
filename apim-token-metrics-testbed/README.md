@@ -217,12 +217,6 @@ This creates:
 
 > **Note**: APIM provisioning takes ~10–15 minutes. RBAC propagation needs
 > ~5 minutes after that.
-- Event Hub Namespace + `audit-logs` hub (Standard tier) — Approach 2 destination
-- APIM instance (Basicv2) with combined policy (both `llm-emit-token-metric` + `log-to-eventhub`) and Responses API operations
-- AI Services account with `gpt-5.4-mini` deployment (reasoning model)
-- 3 APIM subscriptions (tenant-a, tenant-b, tenant-c) for multi-tenant testing
-
-**Note**: APIM provisioning takes ~10-15 minutes. RBAC propagation needs ~5 minutes after that.
 
 ### 3. Install Python dependencies
 
@@ -281,7 +275,40 @@ Available validation queries:
 - `all_dimensions_check` — Verify all custom dimensions are populated
 - `streaming_vs_nonstreaming` — Compare metrics across operation types
 
-### 6. Cleanup
+### 6. Deploy the workbook
+
+```bash
+python deploy_workbook.py
+```
+
+This deploys the **LLM Token Billing Dashboard** Azure Monitor Workbook. The
+script reads [workbook-template.json](workbook-template.json) and creates the
+workbook in the same resource group as App Insights. On success it prints the
+portal URL.
+
+The workbook includes seven sections:
+
+- **KPI tiles** — Total tokens, prompt tokens, completion tokens, API call
+  count for the selected time range
+- **Token usage over time** — 5-minute-bucket timechart for all three token
+  types
+- **Prompt vs completion breakdown** — Pie chart showing token composition
+- **Per-subscription table** — Token totals and estimated USD cost per APIM
+  subscription
+- **Tenant billing breakdown** — Bar chart of token usage per subscription
+  over time
+- **Raw API calls** — Last 50 API calls with all dimension values
+- **Token distribution stats** — P50, P95, P99 percentiles for token counts
+
+> **Tip**: Navigate to `appi-xxxxx` → **Workbooks** → **LLM Token Billing
+> Dashboard** in the Azure portal to open it directly. Use the **Time Range**
+> and **Subscription** parameter dropdowns to filter the view.
+
+> **KQL note**: `format_decimal()` is an ADX-only function not available in
+> App Insights KQL. All numeric columns in this workbook are returned as plain
+> integers. See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for details.
+
+### 7. Cleanup
 
 ```bash
 ./cleanup.sh
@@ -297,6 +324,8 @@ Available validation queries:
 | `deploy.sh` | One-click deploy script (creates RG, deploys Bicep, fetches keys) |
 | `test_token_metrics.py` | Responses API test client: non-streaming, streaming, HTTP, SDK |
 | `validate_metrics.py` | KQL queries to verify metrics in App Insights `customMetrics` |
+| `workbook-template.json` | Azure Monitor Workbook definition: KPI tiles, timechart, per-tenant breakdown, raw call log, token stats |
+| `deploy_workbook.py` | Deploy script: pushes workbook to Azure Monitor via `az rest PUT`; prints portal URL on success |
 | `cleanup.sh` | Delete all test resources |
 | `requirements.txt` | Python dependencies |
 | `TROUBLESHOOTING.md` | Full debugging journey and root cause analysis |
