@@ -1,6 +1,6 @@
 """
 Validate Token Metrics in Application Insights
-Queries customMetrics table via Azure CLI to confirm llm-emit-token-metric
+Queries customMetrics table via Azure CLI to confirm emit-metric
 policy is emitting token counts correctly.
 
 Usage:

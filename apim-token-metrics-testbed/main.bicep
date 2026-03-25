@@ -1,6 +1,6 @@
 // ============================================================================
 // APIM Token Metrics + Audit Logging Test Bed
-// Approach 1: llm-emit-token-metric → App Insights custom metrics (billing)
+// Approach 1: emit-metric (generic) → App Insights custom metrics (billing)
 // Approach 2: log-to-eventhub → Event Hub (audit/evaluation logging)
 // Based on: Azure-Samples/ai-gateway labs/token-metrics-emitting
 // ============================================================================
@@ -34,7 +34,7 @@ param modelsConfig array = [
   {
     name: 'gpt-5.4-mini'
     publisher: 'OpenAI'
-    version: '2026-03-05'
+    version: '2026-03-17'
     sku: 'GlobalStandard'
     capacity: 20
   }
@@ -153,6 +153,21 @@ resource apimLogger 'Microsoft.ApiManagement/service/loggers@2024-05-01' = {
   }
 }
 
+// APIM diagnostic: Wire App Insights logger to API telemetry (required for emit-metric)
+resource apimAppInsightsDiagnostic 'Microsoft.ApiManagement/service/diagnostics@2024-05-01' = {
+  parent: apim
+  name: 'applicationinsights'
+  properties: {
+    loggerId: apimLogger.id
+    alwaysLog: 'allErrors'
+    sampling: {
+      samplingType: 'fixed'
+      percentage: 100
+    }
+    metrics: true
+  }
+}
+
 // Diagnostic setting: Send APIM Gateway Logs to Log Analytics
 resource apimDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
   scope: apim
@@ -162,6 +177,10 @@ resource apimDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-previ
     logs: [
       {
         category: 'GatewayLogs'
+        enabled: true
+      }
+      {
+        category: 'GatewayLlmLogs'
         enabled: true
       }
     ]
