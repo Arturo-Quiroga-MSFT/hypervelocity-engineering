@@ -28,35 +28,60 @@ The following sections map HVE Core agents, skills, and workflows to every deliv
 
 ```mermaid
 graph LR
-    subgraph pioneer ["Pioneer Innovation"]
-        TB["Tech Briefing"]
-        WS["Workshop"]
-        HK["Hackathons"]
-        SDA["Strategic Deal\nActivation"]
+    subgraph pioneer ["🔭 Pioneer Innovation"]
+        direction LR
+        TB["🎤 Tech\nBriefing"]
+        WS["🧪 Workshop"]
+        HK["⚡ Hackathons"]
+        SDA["🤝 Strategic Deal\nActivation"]
+        TB --> WS --> HK --> SDA
     end
 
-    subgraph commit ["Commit to Build"]
-        PL["Planning"]
-        ENV["Envisioning"]
+    subgraph commit_stage ["📋 Commit to Build"]
+        direction LR
+        PL["📐 Planning"]
+        ENV["💡 Envisioning"]
+        PL --> ENV
     end
 
-    subgraph build ["Build to Consume"]
-        ADS["Architecture\nDesign Sessions"]
-        POC["Proof of Concept"]
-        BLD["Build"]
-        OV["Offering\nValidation"]
-        OC["Offering\nCommercialization"]
-        OA["Offering\nActivation"]
+    subgraph build ["🚀 Build to Consume"]
+        direction LR
+        ADS["🏗️ Architecture\nDesign Sessions"]
+        POC["🔬 Proof of\nConcept"]
+        BLD["⚙️ Build"]
+        OV["✅ Offering\nValidation"]
+        OC["🏪 Offering\nCommercialization"]
+        OA["📈 Offering\nActivation"]
+        ADS --> POC --> BLD --> OV --> OC --> OA
     end
 
-    TB --> WS --> HK --> SDA
-    SDA --> PL --> ENV
-    ENV --> ADS --> POC --> BLD --> OV --> OC --> OA
+    SDA -.->|"10%\ntime"| PL
+    ENV -.->|"60%\ntime"| ADS
 
-    style pioneer fill:#E3F2FD,stroke:#1E88E5,color:#000
-    style commit fill:#FFF3E0,stroke:#FB8C00,color:#000
-    style build fill:#E8F5E9,stroke:#43A047,color:#000
+    style pioneer fill:#E3F2FD,stroke:#1565C8,color:#000,stroke-width:2px
+    style commit_stage fill:#FFF3E0,stroke:#EF6C00,color:#000,stroke-width:2px
+    style build fill:#E8F5E9,stroke:#2E7D32,color:#000,stroke-width:2px
+
+    style TB fill:#90CAF9,stroke:#1565C8,color:#000
+    style WS fill:#90CAF9,stroke:#1565C8,color:#000
+    style HK fill:#90CAF9,stroke:#1565C8,color:#000
+    style SDA fill:#64B5F6,stroke:#1565C8,color:#000
+
+    style PL fill:#FFE0B2,stroke:#EF6C00,color:#000
+    style ENV fill:#FFE0B2,stroke:#EF6C00,color:#000
+
+    style ADS fill:#A5D6A7,stroke:#2E7D32,color:#000
+    style POC fill:#A5D6A7,stroke:#2E7D32,color:#000
+    style BLD fill:#81C784,stroke:#2E7D32,color:#000
+    style OV fill:#81C784,stroke:#2E7D32,color:#000
+    style OC fill:#66BB6A,stroke:#2E7D32,color:#000
+    style OA fill:#4CAF50,stroke:#2E7D32,color:#fff
+
+    linkStyle 3 stroke:#EF6C00,stroke-width:2px,stroke-dasharray:5
+    linkStyle 4 stroke:#2E7D32,stroke-width:2px,stroke-dasharray:5
 ```
+
+> **Roadmap to Revenue Journey** — Pioneer Innovation (discover) → Commit to Build (10% of PSA time) → Build to Consume (60% of PSA time)
 
 ---
 
