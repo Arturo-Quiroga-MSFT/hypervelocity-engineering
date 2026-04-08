@@ -96,9 +96,12 @@ The final guide ensures quality before go-live:
 
 ## Going Deeper
 
-After completing this series, explore the comprehensive guide covering all HVE Core capabilities for PSAs:
+After completing this series, explore the comprehensive guide and detailed how-to workflows:
 
-* [HVE Core Use Cases for PSAs](hve-core-use-cases-for-psa.md) covers the full RPI (Research, Plan, Implement) workflow, 15+ agents, custom agent creation, coding standards by stack, and project management tools.
+* [HVE Core Use Cases for PSAs](hve-core-use-cases-for-psa.md) — comprehensive reference covering all HVE Core capabilities mapped to the GCPS Partner Technical Deliverables Catalogue
+* [How-To: Pioneer Innovation](hve-howto-pioneer-innovation.md) — step-by-step workflows for Tech Briefings, Workshops, Hackathons, and Strategic Deal Activation
+* [How-To: Commit to Build](hve-howto-commit-to-build.md) — step-by-step workflows for Planning and Envisioning with Design Thinking
+* [How-To: Build to Consume](hve-howto-build-to-consume.md) — step-by-step workflows for ADS, POC, Build, Offering Validation, Commercialization, and Activation
 
 ## Key Links
 
