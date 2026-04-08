@@ -28,7 +28,7 @@ The following sections map HVE Core agents, skills, and workflows to every deliv
 
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': {'fontSize': '18px', 'fontFamily': 'Segoe UI, Helvetica, Arial', 'primaryColor': '#E3F2FD'}}}%%
-graph LR
+graph TD
     subgraph pioneer ["🔭  PIONEER INNOVATION"]
         direction LR
         TB["🎤  Tech Briefing"]
@@ -56,8 +56,7 @@ graph LR
         ADS ==> POC ==> BLD ==> OV ==> OC ==> OA
     end
 
-    SDA -.-> PL
-    ENV -.-> ADS
+    pioneer -.-> commit_stage -.-> build
 
     style pioneer fill:#E3F2FD,stroke:#1565C8,color:#000,stroke-width:3px
     style commit_stage fill:#FFF3E0,stroke:#EF6C00,color:#000,stroke-width:3px
@@ -77,7 +76,6 @@ graph LR
     style OV fill:#81C784,stroke:#2E7D32,color:#000,stroke-width:2px
     style OC fill:#66BB6A,stroke:#2E7D32,color:#000,stroke-width:2px
     style OA fill:#4CAF50,stroke:#2E7D32,color:#fff,stroke-width:2px
-    style OV fill:#81C784,stroke:#2E7D32,color:#000
     style OC fill:#66BB6A,stroke:#2E7D32,color:#000
     style OA fill:#4CAF50,stroke:#2E7D32,color:#fff
 
