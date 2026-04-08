@@ -2,7 +2,7 @@
 title: HVE Quick Start Series for Partner Solutions Architects
 description: "A beginner-friendly learning path for PSAs to get productive with HVE Core in under 20 minutes"
 author: Arturo Quiroga
-ms.date: 2026-03-18
+ms.date: 2026-04-08
 ms.topic: overview
 keywords:
   - hve-core
@@ -92,7 +92,7 @@ These three guides produce partner-facing deliverables:
 
 The final guide ensures quality before go-live:
 
-* **Quick Start 7** reviews the partner's code and infrastructure for OWASP Top 10 vulnerabilities, AI-specific risks like prompt injection, and common Azure security misconfigurations. Catching these before production protects the partner and your credibility.
+* **Quick Start 7** reviews the partner's code and infrastructure using the **Security Planner** agent, which automatically selects the right OWASP skill set based on the stack: OWASP Top 10, LLM Top 10, Agentic Top 10, MCP Top 10, Infrastructure Top 10, and Secure by Design principles. Catching these issues before production protects the partner and your credibility.
 
 ## Going Deeper
 
@@ -111,4 +111,4 @@ After completing this series, explore the comprehensive guide covering all HVE C
 
 ---
 
-*HVE Quick Start Series for Partner Solutions Architects, March 2026*
+*HVE Quick Start Series for Partner Solutions Architects, April 2026*

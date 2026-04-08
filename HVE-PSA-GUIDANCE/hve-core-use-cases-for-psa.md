@@ -4,7 +4,7 @@
 > **Repository**: <https://github.com/microsoft/hve-core>  
 > **Documentation**: <https://microsoft.github.io/hve-core/>  
 > **VS Code Extension**: [Install HVE Core](https://marketplace.visualstudio.com/items?itemName=ise-hve-essentials.hve-core)  
-> **Date**: February 27, 2026
+> **Date**: April 8, 2026
 
 ---
 
@@ -113,7 +113,27 @@ When embedded with a partner dev team:
 
 ---
 
-### 8. Building Custom Reusable Agents
+### 9. Security Reviews Before Production
+
+The **Security Planner** orchestrates a full multi-skill security review without requiring you to be a security expert. A single prompt triggers the `Codebase Profiler`, which detects what's in the repo and activates only the relevant OWASP skill sets automatically.
+
+| Partner's Stack | Skills That Activate Automatically |
+|---|---|
+| Any repo | `owasp-top-10` (web app vulnerabilities), `secure-by-design` (UK Gov + ASD/ACSC principles) |
+| Python/C# agent code (MAF, Foundry) | `owasp-agentic` (agent-specific risks, e.g. prompt injection chains) |
+| Azure OpenAI, RAG pipelines | `owasp-llm` (LLM Top 10, data leakage, insecure output handling) |
+| MCP server code | `owasp-mcp` (MCP Top 10, tool poisoning, excessive permissions) |
+| `.bicep` or `.tf` IaC files | `owasp-infrastructure` (Infrastructure Top 10, public endpoints, missing NSGs) |
+
+**Prompt to start:**
+
+```text
+Analyse the code and produce a vulnerability report.
+```
+
+The report is written to `.copilot-tracking/security/` with findings organized by severity (Critical, High, Medium, Low) and OWASP category. See [Quick Start 7](hve-quick-start-7-security-review.md) for a step-by-step walkthrough.
+
+---
 
 Using the `prompt-builder` agent, we can create **our own custom agents** tailored to repeatable engagement patterns:
 
@@ -125,7 +145,7 @@ These become shareable artifacts across our PSA team.
 
 ---
 
-### 9. Recommended Agents for the PSA Role
+### 10. Recommended Agents for the PSA Role
 
 After installation, these are the agents most relevant to our daily work enabling partners on Azure AI and Agent AI:
 
@@ -139,7 +159,8 @@ After installation, these are the agents most relevant to our daily work enablin
 | **Azure IaC Generator** | Scaffold Bicep/Terraform for Azure AI resources |
 | **Azure IaC Exporter** | Export existing Azure resource configs to IaC |
 | **AzureCostOptimizeAgent** | Cost analysis for partner Azure AI deployments |
-| **PR Review** | Review partner code contributions |
+| **Security Planner** | Security reviews before production — auto-detects and applies the right OWASP skills based on the partner's stack |
+| **PR Review** | Review partner code contributions for functional correctness and coding standards |
 | **Memory** | Store context about your preferences (MAF, Foundry, partner details) across sessions |
 | **Prompt Builder** | Create custom agents tailored to your engagement patterns |
 | **Doc Ops** | Generate documentation for partner deliverables |
@@ -179,4 +200,4 @@ Full installation options (CLI, submodules, multi-root workspaces): [Installatio
 
 ---
 
-*Prepared for the Partner Solutions Architects (PSA) team — February 2026*
+*Prepared for the Partner Solutions Architects (PSA) team — April 2026*
