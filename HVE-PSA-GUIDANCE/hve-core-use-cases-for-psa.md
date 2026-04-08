@@ -60,6 +60,21 @@ graph LR
 
 ---
 
+## How Frontier PSA Capabilities Map to HVE Core
+
+The GCPS catalogue defines **Frontier PSA** capabilities that augment each deliverable with AI tooling. The table below shows how each Frontier PSA capability maps to specific HVE Core agents:
+
+| Frontier PSA Capability | What It Means | HVE Core Agent(s) |
+|---|---|---|
+| **Researcher** | Deep research on Azure services, SDKs, APIs, competitive landscape, and RFP requirements | `Researcher Subagent`, `Explore` |
+| **Analyst** | Data analysis, business case structuring, and requirements formalization | `DataAnalysisExpert`, `brd-builder`, `prd-builder`, `product-manager-advisor` |
+| **Architect** | Architecture design, diagramming, decision records, WAF/CAF validation | `arch-diagram-builder`, `system-architecture-reviewer`, `adr-creation`, `Azure IaC Generator` |
+| **Rapid Prototype** | Fast scaffolding of working prototypes and demos | RPI workflow (`task-researcher` + `task-planner` + `task-implementor`), `gen-streamlit-dashboard`, `gen-jupyter-notebook` |
+| **GHCP** (GitHub Copilot) | AI-assisted coding with enforced conventions and constraint-based implementation | `task-implementor`, coding instructions (Python, C#, Bicep, Terraform, Bash), `PR Review` |
+| **Copilot** (General AI assist) | Broad AI assistance for validation, review, and commercialization tasks | `Security Planner`, `Implementation Validator`, `Plan Validator`, `Prompt Builder` |
+
+---
+
 ## Stage 1: Pioneer Innovation
 
 ### 1.1 Tech Briefing
@@ -130,16 +145,25 @@ graph LR
 
 ### 2.1 Planning
 
-> Plan development of new or modernized partner offerings: MVP execution timelines, designations and specialization, post-development pipeline, and workforce skilling plan.
+> Collaborative discussion with PDM, PTS, PSA, and GTM. Collaborative planning with partner to agree on 1-3 priorities, stakeholder alignment, and role alignment.
 
-| HVE Agent / Capability | How It Helps |
-|---|---|
-| `task-planner` | Generate structured implementation plans with tasks, dependencies, milestones, and architecture considerations for the MVP |
-| `prd-builder` | Build a Product Requirements Document structuring what the partner's offering needs |
-| `product-manager-advisor` | Help partners prioritize features by business impact and align with MAICPP specialization requirements |
-| `agile-coach` | Advise on sprint planning, backlog grooming, story quality, and velocity targets for the build |
-| `Plan Validator` | Validate generated implementation plans against the research and requirements before execution begins |
-| `Experiment Designer` | Guide hypothesis formation and MVE (Minimum Viable Experiment) design when validating risky assumptions before committing to a full build |
+**What is done**: Plan development of new or modernized partner offerings: MVP execution timelines, designations and specialization, post-development pipeline, and workforce skilling plan.
+
+**Outcomes**: Secure executive commitment to invest in new/enhanced solution or offering based on business value. Ensure partner commitment to new and renewal of MAICPP specializations and required technical capabilities.
+
+**Traditional tools**: T&T Slides, PMX
+
+**Frontier PSA capabilities**: Researcher, Analyst
+
+| HVE Agent / Capability | Frontier PSA Role | How It Helps |
+|---|---|---|
+| `task-planner` | Analyst | Generate structured implementation plans with tasks, dependencies, milestones, and architecture considerations for the MVP |
+| `prd-builder` | Analyst | Build a Product Requirements Document structuring what the partner's offering needs |
+| `product-manager-advisor` | Analyst | Help partners prioritize features by business impact and align with MAICPP specialization requirements |
+| `agile-coach` | Analyst | Advise on sprint planning, backlog grooming, story quality, and velocity targets for the build |
+| `Plan Validator` | Analyst | Validate generated implementation plans against the research and requirements before execution begins |
+| `Researcher Subagent` | Researcher | Research Azure AI service options, SDK versions, and technical feasibility for each planned feature |
+| `Experiment Designer` | Researcher | Guide hypothesis formation and MVE (Minimum Viable Experiment) design when validating risky assumptions before committing to a full build |
 
 **Example scenario**: A partner commits to building an AI-powered claims processing offering targeting Azure AI Document Intelligence + Azure OpenAI. Use `prd-builder` to formalize the product requirements, `task-planner` to create the MVP execution plan with timelines, and `agile-coach` to structure the sprint cadence. `Plan Validator` checks the plan for gaps before the team starts coding.
 
@@ -147,16 +171,25 @@ graph LR
 
 ### 2.2 Envisioning
 
-> Identify current state, business goals, and motivations. Brainstorm and ideate to define scenarios and use cases. Identify "customer zero" for each build engagement.
+> Brainstorming, art of the possible, Design Thinking, discovery, daisy chain, and skilling. Identify current state, business goals, and motivations. Identify "customer zero" for each build engagement.
 
-| HVE Agent / Capability | How It Helps |
-|---|---|
-| `dt-coach` | Guide the full Design Thinking workflow (9-method HVE framework) to empathize with end-users, define the problem, and ideate solutions |
-| `brd-builder` | Capture business requirements, goals, and constraints in a structured document |
-| `prd-builder` | Translate business requirements into product requirements with user stories and acceptance criteria |
-| `product-manager-advisor` | Help the partner assess which scenarios have the highest business impact and feasibility |
-| `ux-ui-designer` | Run Jobs-to-be-Done analysis and user journey mapping for the partner's AI-powered interfaces |
-| `Researcher Subagent` | Research competitor approaches, Azure AI capabilities, and technical feasibility for each proposed scenario |
+**What is done**: Identify the current state of the partner's business, including insights, goals, and motivations. Brainstorm and ideate to define scenarios and use cases.
+
+**Outcomes**: Partner alignment on next steps and high-level plan. Scenarios and use cases identified and aligned to business outcome. Tech roadmap determined for developing partner offerings.
+
+**Traditional tools**: Innovation Wksp, AI Cards Wksp, PMX
+
+**Frontier PSA capabilities**: Researcher, Analyst, Architect
+
+| HVE Agent / Capability | Frontier PSA Role | How It Helps |
+|---|---|---|
+| `dt-coach` | Analyst | Guide the full Design Thinking workflow (9-method HVE framework) to empathize with end-users, define the problem, and ideate solutions |
+| `brd-builder` | Analyst | Capture business requirements, goals, and constraints in a structured document |
+| `prd-builder` | Analyst | Translate business requirements into product requirements with user stories and acceptance criteria |
+| `product-manager-advisor` | Analyst | Help the partner assess which scenarios have the highest business impact and feasibility |
+| `ux-ui-designer` | Analyst | Run Jobs-to-be-Done analysis and user journey mapping for the partner's AI-powered interfaces |
+| `Researcher Subagent` | Researcher | Research competitor approaches, Azure AI capabilities, and technical feasibility for each proposed scenario |
+| `arch-diagram-builder` | Architect | Produce early-stage architecture sketches to validate technical feasibility during envisioning |
 
 **Example scenario**: A partner wants to modernize their field service application with AI. Use `dt-coach` to run empathy workshops, `brd-builder` to capture the business case, and `product-manager-advisor` to prioritize which AI scenarios (predictive maintenance, knowledge search, scheduling optimization) to build first. `ux-ui-designer` maps the field technician's journey to identify where AI adds the most value.
 
@@ -166,16 +199,26 @@ graph LR
 
 ### 3.1 Architecture Design Sessions (ADS)
 
-> Guide the partner in determining the best architecture using Microsoft products, ensuring the offering adheres to best practices and is well-architected.
+> Refine broad ideas into specific plans. Discuss various options and approaches. Daisy chain and skilling.
 
-| HVE Agent / Capability | How It Helps |
-|---|---|
-| `arch-diagram-builder` | Generate Mermaid architecture diagrams for the partner's solution design (Azure AI + data flows, networking, identity) |
-| `system-architecture-reviewer` | Review the proposed architecture for misconfigurations, anti-patterns, and WAF/CAF alignment |
-| `adr-creation` | Document every architecture decision with context, options considered, and trade-offs |
-| `security-plan-creator` | Create security plans for partner apps handling sensitive data via Azure AI services |
-| `Researcher Subagent` | Deep-dive into specific Azure service options (SKU selection, regional availability, feature comparison) |
-| `AzureCostOptimizeAgent` | Provide cost analysis so architecture decisions account for operational cost impact |
+**What is done**: Guide the partner in determining the best architecture using Microsoft products, ensuring the offering adheres to best practices and is well-architected.
+
+**Outcomes**: Architecture diagram. Contribute to **Ready** (SDC).
+
+**Traditional tools**: Draw.io, Visio, PMX
+
+**Frontier PSA capabilities**: Rapid Prototype, Researcher, GHCP, Architect
+
+| HVE Agent / Capability | Frontier PSA Role | How It Helps |
+|---|---|---|
+| `arch-diagram-builder` | Architect | Generate Mermaid architecture diagrams for the partner's solution design (Azure AI + data flows, networking, identity) |
+| `system-architecture-reviewer` | Architect | Review the proposed architecture for misconfigurations, anti-patterns, and WAF/CAF alignment |
+| `adr-creation` | Architect | Document every architecture decision with context, options considered, and trade-offs |
+| `security-plan-creator` | Architect | Create security plans for partner apps handling sensitive data via Azure AI services |
+| `Researcher Subagent` | Researcher | Deep-dive into specific Azure service options (SKU selection, regional availability, feature comparison) |
+| `AzureCostOptimizeAgent` | Researcher | Provide cost analysis so architecture decisions account for operational cost impact |
+| `Azure IaC Generator` | Rapid Prototype | Scaffold Bicep/Terraform to validate that the architecture is deployable |
+| Coding instructions (Bicep, Terraform) | GHCP | Enforce IaC best practices on any infrastructure code produced during the session |
 
 **Example scenario**: An ADS for a partner building a multi-tenant AI agent platform on Azure. Use `arch-diagram-builder` to diagram the architecture, `system-architecture-reviewer` to validate against WAF pillars, `adr-creation` to document why Cosmos DB was chosen over SQL, and `security-plan-creator` to address data isolation between tenants.
 
@@ -183,16 +226,25 @@ graph LR
 
 ### 3.2 Proof of Concept (POC)
 
-> Collaborate with the partner to build a prototype demonstrating feasibility and potential. Prove Microsoft services technical capabilities with "customer zero."
+> Prove value of product and/or services selected in ADS. Prove approach will meet needs. Skilling.
 
-| HVE Agent / Capability | How It Helps |
-|---|---|
-| **RPI workflow** (`task-researcher` → `task-planner` → `task-implementor`) | Full Research → Plan → Implement cycle for a structured, auditable PoC build |
-| `AIAgentExpert` | AI agent architecture guidance for MAF-based PoCs |
-| `Azure IaC Generator` | Scaffold Bicep/Terraform for Azure resources needed by the PoC (OpenAI, AI Search, App Service, Cosmos DB) |
-| `gen-streamlit-dashboard` | Build demo dashboards to present PoC results to partner stakeholders |
-| `gen-jupyter-notebook` | Scaffold Jupyter notebooks for AI model experimentation or SDK exploration during the PoC |
-| Coding instructions (Python, C#, Bicep, Terraform, Bash) | Auto-apply coding conventions so PoC code follows production-quality patterns from day one |
+**What is done**: Collaborate with the partner to build a prototype demonstrating feasibility and potential. Prove Microsoft services technical capabilities with "customer zero."
+
+**Outcomes**: Commitment to build practice or product.
+
+**Traditional tools**: AIBS/CAIP/Sec tools and services, PMX
+
+**Frontier PSA capabilities**: GHCP, Rapid Prototype, Architect
+
+| HVE Agent / Capability | Frontier PSA Role | How It Helps |
+|---|---|---|
+| **RPI workflow** (`task-researcher` → `task-planner` → `task-implementor`) | Rapid Prototype | Full Research → Plan → Implement cycle for a structured, auditable PoC build |
+| `AIAgentExpert` | Architect | AI agent architecture guidance for MAF-based PoCs |
+| `Azure IaC Generator` | Rapid Prototype | Scaffold Bicep/Terraform for Azure resources needed by the PoC (OpenAI, AI Search, App Service, Cosmos DB) |
+| `gen-streamlit-dashboard` | Rapid Prototype | Build demo dashboards to present PoC results to partner stakeholders |
+| `gen-jupyter-notebook` | Rapid Prototype | Scaffold Jupyter notebooks for AI model experimentation or SDK exploration during the PoC |
+| `arch-diagram-builder` | Architect | Update architecture diagrams as the PoC evolves |
+| Coding instructions (Python, C#, Bicep, Terraform, Bash) | GHCP | Auto-apply coding conventions so PoC code follows production-quality patterns from day one |
 
 **Example scenario**: A partner wants to prove that Azure OpenAI + AI Search can power their customer support agent with MAF on Foundry Agent Services. The RPI workflow researches the right SDK versions, plans the architecture, and scaffolds the implementation. `Azure IaC Generator` provisions the resources. `gen-streamlit-dashboard` builds a demo UI for the partner to show their "customer zero."
 
@@ -200,17 +252,26 @@ graph LR
 
 ### 3.3 Build
 
-> Support and guide technical design, development, and testing for the partner's offering. Accountability for deployment timeline and commercial availability.
+> Light project management, troubleshooting, Q&A support, and skilling.
 
-| HVE Agent / Capability | How It Helps |
-|---|---|
-| `task-implementor` | Execute implementation plans with constraint-based coding, reducing hallucinated API calls |
-| `PR Review` | Review partner code contributions for functional correctness and coding standards (parallel functional + standards lanes) |
-| `Security Planner` | Run security reviews before production, auto-detecting the right OWASP skills based on the stack |
-| `Implementation Validator` | Verify completed implementations against the plan, catching drift and missed requirements |
-| `agile-coach` | Advise on sprint planning, velocity, and backlog management during the build |
-| `Azure IaC Generator` / `Azure IaC Exporter` | Generate or export IaC for deployment automation |
-| Coding instructions (Python, C#, Bicep, Terraform, Bash) | Enforce coding conventions and best practices across the entire codebase automatically |
+**What is done**: Support and guide technical design, development, and testing for the partner's offering. Accountability for deployment timeline and commercial availability date.
+
+**Outcomes**: Practice or product launched in market. Contribute to **Ready** (ESI). Published IP offer in marketplace (SDC). Partner attains specialization (G/SI and Channel).
+
+**Traditional tools**: AIBS/CAIP/Sec tools and services, PMX
+
+**Frontier PSA capabilities**: GHCP, Architect
+
+| HVE Agent / Capability | Frontier PSA Role | How It Helps |
+|---|---|---|
+| `task-implementor` | GHCP | Execute implementation plans with constraint-based coding, reducing hallucinated API calls |
+| `PR Review` | GHCP | Review partner code contributions for functional correctness and coding standards (parallel functional + standards lanes) |
+| `Security Planner` | GHCP | Run security reviews before production, auto-detecting the right OWASP skills based on the stack |
+| `Implementation Validator` | GHCP | Verify completed implementations against the plan, catching drift and missed requirements |
+| `agile-coach` | GHCP | Advise on sprint planning, velocity, and backlog management during the build |
+| `Azure IaC Generator` / `Azure IaC Exporter` | Architect | Generate or export IaC for deployment automation |
+| `arch-diagram-builder` | Architect | Keep architecture diagrams current as the build evolves |
+| Coding instructions (Python, C#, Bicep, Terraform, Bash) | GHCP | Enforce coding conventions and best practices across the entire codebase automatically |
 
 **Security review detail**: The `Security Planner` auto-detects and applies the right OWASP checks:
 
@@ -228,14 +289,22 @@ See [Quick Start 7](hve-quick-start-7-security-review.md) for a step-by-step wal
 
 ### 3.4 Offering Validation
 
-> Validate the partner's offering alignment with taxonomy and Well-Architected Framework (WAF).
+> Assess product or practice readiness.
 
-| HVE Agent / Capability | How It Helps |
-|---|---|
-| `system-architecture-reviewer` | Validate the offering's architecture against WAF pillars (Reliability, Security, Cost Optimization, Operational Excellence, Performance Efficiency) |
-| `Security Planner` | Run a full security review to confirm the offering meets baseline security requirements |
-| `Implementation Validator` | Verify the final implementation matches the approved architecture and plan |
-| `Plan Validator` | Cross-check the delivery against the original planning documents for completeness |
+**What is done**: Validate the partner's offering alignment with the taxonomy and Well-Architected Framework (WAF).
+
+**Outcomes**: TTA logged in tooling. **Qualified** (AII). The partner's offering is well-aligned with selected taxonomy (service offer), documented, and/or is well-architected (IP offer).
+
+**Traditional tools**: PMX, TTA
+
+**Frontier PSA capabilities**: Copilot
+
+| HVE Agent / Capability | Frontier PSA Role | How It Helps |
+|---|---|---|
+| `system-architecture-reviewer` | Copilot | Validate the offering's architecture against WAF pillars (Reliability, Security, Cost Optimization, Operational Excellence, Performance Efficiency) |
+| `Security Planner` | Copilot | Run a full security review to confirm the offering meets baseline security requirements |
+| `Implementation Validator` | Copilot | Verify the final implementation matches the approved architecture and plan |
+| `Plan Validator` | Copilot | Cross-check the delivery against the original planning documents for completeness |
 
 **Example scenario**: A partner's AI-powered analytics offering is feature-complete. Use `system-architecture-reviewer` to validate WAF alignment and produce a gap analysis. Run `Security Planner` to confirm no critical vulnerabilities remain. Use `Implementation Validator` to verify the final code matches the approved architecture design.
 
@@ -243,14 +312,22 @@ See [Quick Start 7](hve-quick-start-7-security-review.md) for a step-by-step wal
 
 ### 3.5 Offering Commercialization
 
-> Guide the partner through co-sell requirements and the offering commercialization process. Move from MCEM stage 1 to stages 2/3 via pre/post sales programs.
+> Marketplace onboarding, coordination and collaboration with Marketplace PG, and skilling.
 
-| HVE Agent / Capability | How It Helps |
-|---|---|
-| `Researcher Subagent` | Research co-sell requirements, marketplace listing prerequisites, and certification checklists |
-| `brd-builder` | Structure the business case documentation required for co-sell readiness |
-| `arch-diagram-builder` | Produce architecture diagrams for marketplace listing documentation |
-| `Prompt Builder` | Create custom prompts for repeatable commercialization tasks (listing generation, compliance checklist walkthroughs) |
+**What is done**: Guide the partner through co-sell requirements and the offering commercialization process. Move from MCEM stage 1 to stages 2/3 via pre/post sales programs.
+
+**Outcomes**: Commercial offer launched. The partner's offering is commercially available and/or transactable in the marketplace (IP offer) and ready for co-sell.
+
+**Traditional tools**: Marketplace, PMX
+
+**Frontier PSA capabilities**: Copilot
+
+| HVE Agent / Capability | Frontier PSA Role | How It Helps |
+|---|---|---|
+| `Researcher Subagent` | Copilot | Research co-sell requirements, marketplace listing prerequisites, and certification checklists |
+| `brd-builder` | Copilot | Structure the business case documentation required for co-sell readiness |
+| `arch-diagram-builder` | Copilot | Produce architecture diagrams for marketplace listing documentation |
+| `Prompt Builder` | Copilot | Create custom prompts for repeatable commercialization tasks (listing generation, compliance checklist walkthroughs) |
 
 **Example scenario**: A partner's AI offering is ready for Azure Marketplace. Use `Researcher Subagent` to check current co-sell requirements, `brd-builder` to structure the business case, and `arch-diagram-builder` to produce the reference architecture for the listing page.
 
@@ -258,14 +335,22 @@ See [Quick Start 7](hve-quick-start-7-security-review.md) for a step-by-step wal
 
 ### 3.6 Offering Activation
 
-> Actively support the partner as they sell their offering to customers. Includes sales skilling to coach partner self-sufficiency.
+> Co-Sell work with 1-3 customers. Ideally connected to practice or product we built. Skilling.
 
-| HVE Agent / Capability | How It Helps |
-|---|---|
-| `gen-streamlit-dashboard` | Build customer-facing demo dashboards the partner's sales team can use during pitches |
-| `Researcher Subagent` | Prepare technical talking points, competitive differentiators, and Azure AI capability summaries for sales enablement |
-| `arch-diagram-builder` | Generate customer-specific architecture diagrams for sales conversations |
-| `Prompt Builder` | Create custom agents the partner's team can reuse independently (e.g., a "Customer Demo Builder" or "Technical FAQ Agent") for self-sufficiency |
+**What is done**: Actively support the partner as they sell their offering to customers. Includes sales skilling to coach partner self-sufficiency.
+
+**Outcomes**: Projected revenue. **Activated** (AII). Activate co-sell for the offering with the partner and drive the first 3 customer wins, boosting consumption by guiding the partner to move end-customers to MCEM stage 4.
+
+**Traditional tools**: All prior tools, PMX
+
+**Frontier PSA capabilities**: Architect, Copilot
+
+| HVE Agent / Capability | Frontier PSA Role | How It Helps |
+|---|---|---|
+| `gen-streamlit-dashboard` | Architect | Build customer-facing demo dashboards the partner's sales team can use during pitches |
+| `Researcher Subagent` | Copilot | Prepare technical talking points, competitive differentiators, and Azure AI capability summaries for sales enablement |
+| `arch-diagram-builder` | Architect | Generate customer-specific architecture diagrams for sales conversations |
+| `Prompt Builder` | Copilot | Create custom agents the partner's team can reuse independently (e.g., a "Customer Demo Builder" or "Technical FAQ Agent") for self-sufficiency |
 
 **Example scenario**: A partner's offering is live and they need to close their first 3 customers. Use `gen-streamlit-dashboard` to build a customizable demo the sales team can run for each prospect. Use `Prompt Builder` to create a reusable "Customer Demo Builder" agent the partner can use independently, coaching them toward self-sufficiency.
 
