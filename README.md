@@ -64,13 +64,13 @@ graph LR
 
 | # | Guide | What You Do | What You Get | Time |
 |---|---|---|---|---|
-| 1 | [Set Your Context Once](hve-quick-start-1-memory.md) | Tell Copilot who you are | Persistent context forever | 30 sec |
-| 2 | [Prep for a Partner Call](hve-quick-start-2-researcher.md) | Ask a technical question | Structured briefing | 2 min |
-| 3 | [Turn Your Whiteboard into a Diagram](hve-quick-start-3-architecture-diagram.md) | Describe an architecture | Shareable Mermaid diagram | 3 min |
-| 4 | [Document Your Architecture Decisions](hve-quick-start-4-adr.md) | Describe a decision you made | Formal decision record | 2 min |
-| 5 | [Build a Partner Demo Dashboard](hve-quick-start-5-demo-dashboard.md) | Describe what to demo | Runnable Streamlit app | 5 min |
-| 6 | [Scaffold Azure Resources as Code](hve-quick-start-6-iac-generator.md) | Describe Azure resources needed | Deployable Bicep/Terraform | 5 min |
-| 7 | [Review Code for Security](hve-quick-start-7-security-review.md) | Point at partner code | Severity-graded security findings | 5 min |
+| 1 | [Set Your Context Once](HVE-PSA-GUIDANCE/quick-starts/hve-quick-start-1-memory.md) | Tell Copilot who you are | Persistent context forever | 30 sec |
+| 2 | [Prep for a Partner Call](HVE-PSA-GUIDANCE/quick-starts/hve-quick-start-2-researcher.md) | Ask a technical question | Structured briefing | 2 min |
+| 3 | [Turn Your Whiteboard into a Diagram](HVE-PSA-GUIDANCE/quick-starts/hve-quick-start-3-architecture-diagram.md) | Describe an architecture | Shareable Mermaid diagram | 3 min |
+| 4 | [Document Your Architecture Decisions](HVE-PSA-GUIDANCE/quick-starts/hve-quick-start-4-adr.md) | Describe a decision you made | Formal decision record | 2 min |
+| 5 | [Build a Partner Demo Dashboard](HVE-PSA-GUIDANCE/quick-starts/hve-quick-start-5-demo-dashboard.md) | Describe what to demo | Runnable Streamlit app | 5 min |
+| 6 | [Scaffold Azure Resources as Code](HVE-PSA-GUIDANCE/quick-starts/hve-quick-start-6-iac-generator.md) | Describe Azure resources needed | Deployable Bicep/Terraform | 5 min |
+| 7 | [Review Code for Security](HVE-PSA-GUIDANCE/quick-starts/hve-quick-start-7-security-review.md) | Point at partner code | Severity-graded security findings | 5 min |
 
 ## Phase 1: Configure, Learn, Visualize
 
@@ -98,10 +98,10 @@ The final guide ensures quality before go-live:
 
 After completing this series, explore the comprehensive guide and detailed how-to workflows:
 
-* [HVE Core Use Cases for PSAs](hve-core-use-cases-for-psa.md) — comprehensive reference covering all HVE Core capabilities mapped to the GCPS Partner Technical Deliverables Catalogue
-* [How-To: Pioneer Innovation](hve-howto-pioneer-innovation.md) — step-by-step workflows for Tech Briefings, Workshops, Hackathons, and Strategic Deal Activation
-* [How-To: Commit to Build](hve-howto-commit-to-build.md) — step-by-step workflows for Planning and Envisioning with Design Thinking
-* [How-To: Build to Consume](hve-howto-build-to-consume.md) — step-by-step workflows for ADS, POC, Build, Offering Validation, Commercialization, and Activation
+* [HVE Core Use Cases for PSAs](HVE-PSA-GUIDANCE/hve-core-use-cases-for-psa.md) — comprehensive reference covering all HVE Core capabilities mapped to the GCPS Partner Technical Deliverables Catalogue
+* [How-To: Pioneer Innovation](HVE-PSA-GUIDANCE/hve-howto-pioneer-innovation.md) — step-by-step workflows for Tech Briefings, Workshops, Hackathons, and Strategic Deal Activation
+* [How-To: Commit to Build](HVE-PSA-GUIDANCE/hve-howto-commit-to-build.md) — step-by-step workflows for Planning and Envisioning with Design Thinking
+* [How-To: Build to Consume](HVE-PSA-GUIDANCE/hve-howto-build-to-consume.md) — step-by-step workflows for ADS, POC, Build, Offering Validation, Commercialization, and Activation
 
 ## Key Links
 
