@@ -1,5 +1,6 @@
 # HVE Core ephemeral workflow artifacts
 .copilot-tracking/
+copilot-outputs/
 
 # Python virtual environments
 .venv/
